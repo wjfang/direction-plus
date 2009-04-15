@@ -1,0 +1,27 @@
+################################################
+#                                              #
+#                Direction Plus                #
+#                                              #
+################################################
+
+================================================
+GOAL
+================================================
+
+A direction service that, given source and destination, not only shows
+direction on map (which is provided by map services, such as Google, 
+usually), but also shows other important information, such as how much
+fuel will be used according to the car, how much CO2 will be generated
+(as well as other environmental concerns), how about the weather along 
+the route, and how about the traffic along the route. So it is called
+Direction Plus (D+).
+
+All meaningful information relevant to the route can be considered to add
+to D+, for instance, motor way services along the route.
+
+================================================
+PLAN
+================================================
+
+1. Use Google Map API to retrieve route information and calculates fuel
+consumption driving VW Polo Match 1.4 80hp 09.
