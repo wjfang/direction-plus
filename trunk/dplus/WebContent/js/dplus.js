@@ -3,6 +3,8 @@
  */
 var LPG = 4.54609188; // litres per gallon
 var MPM = 1609.344; // meters per mile
+var URBAN_AVERAGE = 12; // average speed in urban cycle
+var EXTRA_URBAN_AVERAGE = 39; // average speed in extra urban cycle
 
 /*
  * Global variables
@@ -69,19 +71,48 @@ function navigate() {
  * Analyse route
  */
 function analyseRoute() {
-	var text = "";
-//	text += "<p>" + directions.getDistance().html + "</p>";
-	
 	var route = directions.getRoute(0);
+	var fuel = 0; // fuel in litres
+	
 	for (var i = 0; i < route.getNumSteps(); i++) {
 		var step = route.getStep(i);
-		var html = step.getDescriptionHtml();
 		var meters = step.getDistance().meters;
 		var seconds = step.getDuration().seconds;
 		var speed = (meters / MPM) / (seconds / 3600);
-		text += "<p>" + html + " | " + meters + " | " + seconds + " | " + speed + "</p>";
+		fuel += calcFuelConsumption(speed, meters);
 	}
 	
-	var dplusInfo = document.getElementById("dplus-info");
-	dplusInfo.innerHTML = text;
+	var fuelCell = document.getElementById("dplus-info-fuel");
+	fuelCell.innerHTML = fuel.toFixed(2);
+	
+	var cost = calcFuelCost(fuel);
+	var costCell = document.getElementById("dplus-info-cost");
+	costCell.innerHTML = cost.toFixed(2);
+	
+	document.getElementById("dplus-info").style.display = "block";
 }
+ 
+function calcFuelConsumption(speed, meters) {
+	// mile per gallon
+	var urban = 34.0; 
+	var extra = 54.3;
+	var average = 44.8;
+	
+	var d = meters / MPM;
+	var f = 0;
+	
+	if (speed >= EXTRA_URBAN_AVERAGE) {
+		f = d / extra;
+	} else if (EXTRA_URBAN_AVERAGE - speed > speed - URBAN_AVERAGE) {
+		f = d / average;
+	} else {
+		f = d / urban;
+	}
+	f *= LPG;
+	return f;
+}
+
+function calcFuelCost(fuel) {
+	return fuel * 0.919;
+}
+
