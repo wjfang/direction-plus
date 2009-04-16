@@ -9,6 +9,7 @@
 	
 <!-- javascript -->
 <script type="text/javascript" src="http://maps.google.com/maps?file=api&v=2.x&key=ABQIAAAAj1DqbVODIwfxFozz52vGCBRPYLDdswWYK9xsZ4JkfD5EIBXtmBR4w43TwAtsEfHquR61hzgrmd2xQg"></script>
+<script type="text/javascript" src="http://www.google.com/uds/api?file=uds.js&v=1.0&key=ABQIAAAAj1DqbVODIwfxFozz52vGCBRPYLDdswWYK9xsZ4JkfD5EIBXtmBR4w43TwAtsEfHquR61hzgrmd2xQg"></script>
 <script type="text/javascript" src="./js/dplus.js"></script>
 
 <title>Direction Plus</title>
@@ -18,10 +19,13 @@
 
 <div id="doc3" class="yui-t5">
 	<div id="hd" style="text-align: center; margin-bottom: 1em; margin-top: 1em;">
+		<div style="text-align: center; font-size: x-large; margin-bottom: 0.2em;">Direction+</div>
 		<form>
+			UK postcode <input id="dplus-input-postcode" type="checkbox">
 			From: <input id="dplus-input-from" type="text" size="30">
 			To: <input id="dplus-input-to" type="text" size="30">
-			<input type="button" value="Navigate" onclick="navigate()">
+			Fuel price: <input id="dplus-input-price" type="text" size="1" value="91.9">p			
+			<input type="button" value="Navigate" onclick="navigate()">			
 		</form>
 		<p style="font-style: italic">driving a 2009 Volkswagen Polo Match 1.4 80hp</p>
 	</div>
@@ -34,17 +38,21 @@
 						<div id="dplus-map" style="width: 100%; height: 480px; border: 1px solid black;"></div>
 					</div>
 					<div class="yui-u">
+						<div style="text-align: center; font-weight: bolder; font-size: larger;">Driving Instruction</div>
 						<div id="dplus-route" style="border; 1px solid black;"></div>
 					</div>
 				</div>
 			</div>
 		</div>
 		
-		<div id="dplus-info" class="yui-b" style="display: none;">
-			<table style="width: 100%; border: 1px;">
-				<tr><td style="font-weight: bold;">Fuel Consumption</td><td id="dplus-info-fuel">0</td><td>Litres</td></tr>
-				<tr><td style="font-weight: bold;">Fuel Cost</td><td id="dplus-info-cost">0</td><td>Pounds</td></tr>
+		<div class="yui-b">
+			<div style="text-align: center; font-weight: bolder; font-size: larger;">Route Analysis</div>
+			<div id="dplus-info" style="margin-top: 1em; display: none;">
+			<table style="width: 100%;">
+				<tr><td style="font-weight: bold;">Fuel Consumption:</td><td id="dplus-info-fuel" style="color: red; font-weight: bold;">0</td><td>Litres</td></tr>
+				<tr><td style="font-weight: bold;">Fuel Cost:</td><td id="dplus-info-cost" style="color: red; font-weight: bold;">0</td><td>Pounds</td></tr>
 			</table>
+			</div>
 		</div>
 	</div>
 	
