@@ -7,16 +7,25 @@ var URBAN_AVERAGE = 12; // average speed in urban cycle
 var EXTRA_URBAN_AVERAGE = 39; // average speed in extra urban cycle
 
 /*
+ * MPG (mile per gallon) for 2009 Volkswagen Polo Match 1.4 80hp
+ */
+var URBAN_MPG = 34.0; 
+var EXTRA_URBAN_MPG = 54.3;
+var COMBINED_MPG = 44.8;
+
+/*
  * Global variables
  */
 var directions;	// GDirections instance
+var localSearch; // Google AJAX search
 
 /*
- * Initialisation
+ * Google Maps 
  */
 function initialise() {
 	var map = new GMap2(document.getElementById("dplus-map"));
-    map.setCenter(new GLatLng(50.899994, -1.3999939), 6); // UK
+    map.setCenter(new GLatLng(53.0, -1.4), 6); // UK
+    map.enableScrollWheelZoom();
     var routePanel = document.getElementById("dplus-route");
     directions = new GDirections(map, routePanel);
     
@@ -24,20 +33,72 @@ function initialise() {
     GEvent.addListener(directions, "load", analyseRoute);    
     
     GEvent.addListener(directions, "error", handleErrors);
+    
+    localSearch = new GlocalSearch();
 }
 
-/*
- * Google Maps relevant 
- */
+function navigate() {
+	var from = document.getElementById("dplus-input-from");
+	var to = document.getElementById("dplus-input-to");
+	
+	if (from.value == "" || to.value == "") {
+		alert("Neither \"from\" nor \"to\" can be empty!");
+		return;
+	}
+	
+	if (!document.getElementById("dplus-input-postcode").checked) {
+		var query = "from: " + from.value + " to: " + to.value;
+		directions.load(query);
+		return;
+	}
+	
+	// Now we assume both from and to are uk postcode. TODO: need to check.
+	localSearch.setSearchCompleteCallback(null, function() {
+		if (localSearch.results[0]) {
+			var resultLat = localSearch.results[0].lat;
+			var resultLng = localSearch.results[0].lng;
+			var fromPoint = new GLatLng(resultLat, resultLng);
+//			alert(fromPoint);
+			
+			// deal with "to"
+			localSearch.setSearchCompleteCallback(null, function() {
+				if (localSearch.results[0]) {
+					var resultLat = localSearch.results[0].lat;
+					var resultLng = localSearch.results[0].lng;
+					var toPoint = new GLatLng(resultLat, resultLng);
+//					alert(toPoint);
+					
+					var query = "from: " + fromPoint + " to: " + toPoint;
+					directions.load(query);
+					
+				} else {
+					alert("To postcode not found!");
+				}
+			});
+
+			localSearch.execute(to.value);
+			
+		} else {
+			alert("From postcode not found!");
+		}
+	});
+
+	localSearch.execute(from.value);
+}
+
 function handleErrors() {
 	if (directions.getStatus().code == G_GEO_UNKNOWN_ADDRESS)
-		alert("No corresponding geographic location could be found for one of the specified addresses. This may be due to the fact that the address is relatively new, or it may be incorrect.\nError code: "
+		alert("No corresponding geographic location could be found for one of the specified addresses. " +
+				"This may be due to the fact that the address is relatively new, or it may be incorrect.\nError code: "
 				+ directions.getStatus().code);
 	else if (directions.getStatus().code == G_GEO_SERVER_ERROR)
-		alert("A geocoding or directions request could not be successfully processed, yet the exact reason for the failure is not known.\n Error code: "
+		alert("A geocoding or directions request could not be successfully processed, " +
+				"yet the exact reason for the failure is not known.\n Error code: "
 				+ directions.getStatus().code);
 	else if (directions.getStatus().code == G_GEO_MISSING_QUERY)
-		alert("The HTTP q parameter was either missing or had no value. For geocoder requests, this means that an empty address was specified as input. For directions requests, this means that no query was specified in the input.\n Error code: "
+		alert("The HTTP q parameter was either missing or had no value. For geocoder requests, " +
+				"this means that an empty address was specified as input. For directions requests, " +
+				"this means that no query was specified in the input.\n Error code: "
 				+ directions.getStatus().code);
 
 	// else if (gdir.getStatus().code == G_UNAVAILABLE_ADDRESS) <--- Doc bug...
@@ -57,15 +118,17 @@ function handleErrors() {
 }
 
 /*
- * UI relevant
+ * Use Google AJAX search to map UK postcode to geographical location.
  */
-function navigate() {
-	var from = document.getElementById("dplus-input-from");
-	var to = document.getElementById("dplus-input-to");
-	var query = "from: " + from.value + " to: " + to.value;
-//	alert(query);
-	directions.load(query);
+function usePointFromPostcode(postcode, callbackFunction) {
+	
 }
+ 
+/*
+ * UI
+ */
+
+
 
 /*
  * Analyse route
@@ -91,28 +154,38 @@ function analyseRoute() {
 	
 	document.getElementById("dplus-info").style.display = "block";
 }
- 
+
 function calcFuelConsumption(speed, meters) {
-	// mile per gallon
-	var urban = 34.0; 
-	var extra = 54.3;
-	var average = 44.8;
-	
-	var d = meters / MPM;
-	var f = 0;
-	
+	var miles = meters / MPM; 
+	var gallons = calcGallon2(speed, miles);
+	return gallons * LPG;
+}
+
+// Fuel consumption A1
+function calcGallon1(speed, miles) {
+	var g;
 	if (speed >= EXTRA_URBAN_AVERAGE) {
-		f = d / extra;
+		g = miles / EXTRA_URBAN_MPG;
 	} else if (EXTRA_URBAN_AVERAGE - speed > speed - URBAN_AVERAGE) {
-		f = d / average;
+		g = miles / COMBINED_MPG;
 	} else {
-		f = d / urban;
+		g = miles / URBAN_MPG;
 	}
-	f *= LPG;
-	return f;
+	return g;
+}
+
+//Fuel consumption A2
+function calcGallon2(speed, miles) {
+	var g;
+	if (speed >= EXTRA_URBAN_AVERAGE) {
+		g = miles / EXTRA_URBAN_MPG;
+	} else {
+		g = miles / URBAN_MPG;
+	}
+	return g;
 }
 
 function calcFuelCost(fuel) {
-	return fuel * 0.919;
+	var p = document.getElementById("dplus-input-price").value;
+	return fuel * (p / 100);
 }
-
