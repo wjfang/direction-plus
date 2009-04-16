@@ -24,10 +24,10 @@
 			UK postcode <input id="dplus-input-postcode" type="checkbox">
 			From: <input id="dplus-input-from" type="text" size="30">
 			To: <input id="dplus-input-to" type="text" size="30">
-			Fuel price: <input id="dplus-input-price" type="text" size="1" value="91.9">p			
+			Fuel price: <input id="dplus-input-price" type="text" size="1" value="92.9">p			
 			<input type="button" value="Navigate" onclick="navigate()">			
 		</form>
-		<p style="font-style: italic">driving a 2009 Volkswagen Polo Match 1.4 80hp</p>
+		<p style="font-style: italic">Driving a 2009 Volkswagen Polo Match 1.4 80hp</p>
 	</div>
 
 	<div id="bd">
@@ -52,6 +52,13 @@
 				<tr><td style="font-weight: bold;">Fuel Consumption:</td><td id="dplus-info-fuel" style="color: red; font-weight: bold;">0</td><td>Litres</td></tr>
 				<tr><td style="font-weight: bold;">Fuel Cost:</td><td id="dplus-info-cost" style="color: red; font-weight: bold;">0</td><td>Pounds</td></tr>
 			</table>
+			<br>
+			<p>How many times will you travel along the route?</p>
+			<input type="hidden" id="dplus-info-lasttrip">
+			<input type="radio" id="dplus-info-single" name="dplus-info-trip" value="single" onchange="onSingleTrip()"> Single <br>
+			<input type="radio" name="dplus-info-trip" value="return" onchange="onReturnTrip()"> Return <br> 
+			<input type="radio" name="dplus-info-trip" value="custom" onchange="onCustomTrip()"> Customise 
+			<input id="dplus-info-tripnum" type="text" size="1" onchange="onTripNum()"> <br>
 			</div>
 		</div>
 	</div>
