@@ -118,17 +118,60 @@ function handleErrors() {
 }
 
 /*
- * Use Google AJAX search to map UK postcode to geographical location.
+ * The number of times travelling along the route
  */
-function usePointFromPostcode(postcode, callbackFunction) {
+var lastTripElement;
+var singleTripElement;
+var tripNumElement;
+
+function initTripNumChoice() {
+	if (lastTripElement == undefined)
+		lastTripElement = document.getElementById("dplus-info-lasttrip");
 	
+	if (singleTripElement == undefined)
+		singleTripElement = document.getElementById("dplus-info-single");
+	
+	if (tripNumElement == undefined)
+		tripNumElement = document.getElementById("dplus-info-tripnum");
+
+	lastTripElement.value = 1;
+	singleTripElement.checked = true;
+	tripNumElement.value = 1;
+	tripNumElement.disabled = true;
 }
- 
-/*
- * UI
- */
 
+function onSingleTrip() {
+	updateTripNum(1);
+}
 
+function onReturnTrip() {
+	updateTripNum(2);
+}
+
+function onCustomTrip() {
+	updateTripNum(tripNumElement.value);
+	tripNumElement.disabled = false;
+}
+
+function onTripNum() {
+	updateTripNum(tripNumElement.value);
+}
+
+function updateTripNum(current) {
+	var last = lastTripElement.value;
+	var ratio = current / last;
+	lastTripElement.value = current;
+	updateFuel(ratio);
+	tripNumElement.disabled = true;
+}
+
+function updateFuel(ratio) {
+	var fuelCell = document.getElementById("dplus-info-fuel");
+	var costCell = document.getElementById("dplus-info-cost");
+	
+	fuelCell.innerHTML = (fuelCell.innerHTML * ratio).toFixed(2);
+	costCell.innerHTML = (costCell.innerHTML * ratio).toFixed(2);
+}
 
 /*
  * Analyse route
@@ -153,6 +196,7 @@ function analyseRoute() {
 	costCell.innerHTML = cost.toFixed(2);
 	
 	document.getElementById("dplus-info").style.display = "block";
+	initTripNumChoice();
 }
 
 function calcFuelConsumption(speed, meters) {
