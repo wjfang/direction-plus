@@ -20,8 +20,64 @@ All meaningful information relevant to the route can be considered to add
 to D+, for instance, motor way services along the route.
 
 ================================================
+HOMEPAGE
+================================================
+
+http://code.google.com/p/direction-plus/
+
+================================================
 PLAN
 ================================================
 
 1. Use Google Map API to retrieve route information and calculates fuel
 consumption driving VW Polo Match 1.4 80hp 09.
+
+================================================
+GOOGLE MAPS API KEY
+================================================
+
+ABQIAAAAj1DqbVODIwfxFozz52vGCBRPYLDdswWYK9xsZ4JkfD5EIBXtmBR4w43TwAtsEfHquR61hzgrmd2xQg
+
+This key is good for all URLs consisting of this registered domain (and directory if applicable):
+http://code.google.com/p/direction-plus/
+
+================================================
+Issues
+================================================
+
+GDirections does not understand UK postcode.
+See http://www.tomanthony.co.uk/blog/geocoding-uk-postcodes-with-google-map-api/
+
+================================================
+FUEL CONSUMPTION ALGORITHM
+================================================
+
+http://www.vcacarfueldata.org.uk/information/consumption.asp
+
+Urban cycle
+The urban test cycle is carried out in a laboratory at an ambient temperature 
+of 20°C to 30°C on a rolling road from a cold start, i.e. the engine has not 
+run for several hours. The cycle consists of a series of accelerations, 
+steady speeds, decelerations and idling. Maximum speed is 31 mph (50 km/h), 
+average speed 12 mph (19 km/h) and the distance covered is 2.5 miles (4 km). 
+The cycle is shown as Part One in the diagram below.
+
+Extra-urban cycle
+This cycle is conducted immediately following the urban cycle and consists 
+of roughly half steady-speed driving and the remainder accelerations, 
+decelerations, and some idling. Maximum speed is 75 mph (120 km/h), 
+average speed is 39 mph (63 km/h) and the distance covered is 4.3 miles 
+(7 km). The cycle is shown as Part Two in the diagram below.
+
+Combined Fuel Consumption Figure
+The combined figure presented is for the urban and the extra-urban cycle 
+together. It is therefore an average of the two parts of the test, 
+weighted by the distances covered in each part.
+
+Let s be the average speed for a route step,
+if s >= 39 mph,  extra-urban fuel consumption is applied,
+else if 39 - s > s - 12, combined fuel consumption is applied,
+else urban fuel consumption is applied.
+
+
+
