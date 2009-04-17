@@ -7,11 +7,19 @@ var URBAN_AVERAGE = 12; // average speed in urban cycle
 var EXTRA_URBAN_AVERAGE = 39; // average speed in extra urban cycle
 
 /*
- * MPG (mile per gallon) for 2009 Volkswagen Polo Match 1.4 80hp
+ * Preference
+ * Car description
+ * MPG (mile per gallon): urban, extra urban, combined
+ * Fuel price in pence
+ * Default values are for a 2009 Volkswagen Polo Match 1.4 80hp.
  */
-var URBAN_MPG = 34.0; 
-var EXTRA_URBAN_MPG = 54.3;
-var COMBINED_MPG = 44.8;
+var preference = {
+		car_desc:			"2009 Volkswagen Polo Match 1.4 80hp",
+		urban_mpg:			34.0,
+		extra_urban_mpg:	54.3,
+		combined_mpg:		44.8,
+		fuel_price:			92.9
+}
 
 /*
  * Global variables
@@ -20,7 +28,7 @@ var directions;	// GDirections instance
 var localSearch; // Google AJAX search
 
 /*
- * Google Maps 
+ * Initialisation and termination
  */
 function initialise() {
 	var map = new GMap2(document.getElementById("dplus-map"));
@@ -35,8 +43,20 @@ function initialise() {
     GEvent.addListener(directions, "error", handleErrors);
     
     localSearch = new GlocalSearch();
+    
+//    alert(document.cookie);
+    loadPref();
+    
+    updateUIPref();
 }
 
+function terminate() {
+	savePref();
+}
+
+/*
+ * Google Maps 
+ */
 function navigate() {
 	var from = document.getElementById("dplus-input-from");
 	var to = document.getElementById("dplus-input-to");
@@ -115,6 +135,22 @@ function handleErrors() {
 				+ directions.getStatus().code);
 	else
 		alert("An unknown error occurred.");
+}
+
+/*
+ * Reduce and increase fuel price
+ */
+function reducePrice() {
+	updatePrice(-1.0);
+}
+
+function increasePrice() {
+	updatePrice(1.0);
+}
+
+function updatePrice(inc) {
+	preference.fuel_price = parseFloat(preference.fuel_price) + inc;
+	document.getElementById("dplus-input-price").value = preference.fuel_price;	
 }
 
 /*
@@ -201,7 +237,7 @@ function analyseRoute() {
 
 function calcFuelConsumption(speed, meters) {
 	var miles = meters / MPM; 
-	var gallons = calcGallon2(speed, miles);
+	var gallons = calcGallon1(speed, miles);
 	return gallons * LPG;
 }
 
@@ -209,11 +245,11 @@ function calcFuelConsumption(speed, meters) {
 function calcGallon1(speed, miles) {
 	var g;
 	if (speed >= EXTRA_URBAN_AVERAGE) {
-		g = miles / EXTRA_URBAN_MPG;
+		g = miles / preference.extra_urban_mpg;
 	} else if (EXTRA_URBAN_AVERAGE - speed > speed - URBAN_AVERAGE) {
-		g = miles / COMBINED_MPG;
+		g = miles / preference.combined_mpg;
 	} else {
-		g = miles / URBAN_MPG;
+		g = miles / preference.urban_mpg;
 	}
 	return g;
 }
@@ -222,14 +258,46 @@ function calcGallon1(speed, miles) {
 function calcGallon2(speed, miles) {
 	var g;
 	if (speed >= EXTRA_URBAN_AVERAGE) {
-		g = miles / EXTRA_URBAN_MPG;
+		g = miles / preference.extra_urban_mpg;
 	} else {
-		g = miles / URBAN_MPG;
+		g = miles / preference.urban_mpg;
 	}
 	return g;
 }
 
 function calcFuelCost(fuel) {
-	var p = document.getElementById("dplus-input-price").value;
+	var p = preference.fuel_price;
 	return fuel * (p / 100);
+}
+
+/*
+ * Help and change car buttons
+ */
+function help() {
+	window.open("./help.html", "", 
+			"toolbar=0, scrollbars=1, location=0, statusbar=0, menubar=0, resizable=0, width=640, height=480");	
+}
+
+function changeCar() {
+	window.open("./car.html", "",
+			"toolbar=0, scrollbars=1, location=0, statusbar=0, menubar=0, resizable=0, width=640, height=480");
+}
+
+/*
+ * Preference management based on cookie
+ */
+function loadPref() {
+	var pref = YAHOO.util.Cookie.getSubs("dplus");
+	if (pref != null) {
+		preference = pref;
+	}
+}
+
+function savePref() {
+	YAHOO.util.Cookie.setSubs("dplus", preference, {expires: new Date("January 1, 2025")}); 
+}
+
+function updateUIPref() {
+	document.getElementById("dplus-pref-car").innerHTML = "Driving a " + preference.car_desc;
+    document.getElementById("dplus-input-price").value = preference.fuel_price;
 }

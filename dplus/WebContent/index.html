@@ -10,24 +10,30 @@
 <!-- javascript -->
 <script type="text/javascript" src="http://maps.google.com/maps?file=api&v=2.x&key=ABQIAAAAj1DqbVODIwfxFozz52vGCBRPYLDdswWYK9xsZ4JkfD5EIBXtmBR4w43TwAtsEfHquR61hzgrmd2xQg"></script>
 <script type="text/javascript" src="http://www.google.com/uds/api?file=uds.js&v=1.0&key=ABQIAAAAj1DqbVODIwfxFozz52vGCBRPYLDdswWYK9xsZ4JkfD5EIBXtmBR4w43TwAtsEfHquR61hzgrmd2xQg"></script>
+<script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/yahoo/yahoo-min.js"></script> 
+<script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/cookie/cookie-min.js"></script> 
 <script type="text/javascript" src="./js/dplus.js"></script>
 
-<title>Direction Plus</title>
+<title>Direction+</title>
 </head>
 
-<body onload="initialise()">
+<body onload="initialise()" onunload="terminate()" >
 
 <div id="doc3" class="yui-t5">
 	<div id="hd" style="text-align: center; margin-bottom: 1em; margin-top: 1em;">
 		<div style="text-align: center; font-size: x-large; margin-bottom: 0.2em;">Direction+</div>
 		<form>
 			UK postcode <input id="dplus-input-postcode" type="checkbox">
-			From: <input id="dplus-input-from" type="text" size="30">
-			To: <input id="dplus-input-to" type="text" size="30">
-			Fuel price: <input id="dplus-input-price" type="text" size="1" value="92.9">p			
-			<input type="button" value="Navigate" onclick="navigate()">			
+			From: <input id="dplus-input-from" type="text" size="20">
+			To: <input id="dplus-input-to" type="text" size="20">
+			Fuel price: <input type="button" value="&lt;" onclick="reducePrice()">
+			<input id="dplus-input-price" type="text" size="1">p
+			<input type="button" value="&gt;" onclick="increasePrice()">			
+			<input type="button" value="Navigate" onclick="navigate()">
+			<input type="button" value="Change Car" onclick="changeCar()">
+			<input type="button" value="Help" onclick="help()">
 		</form>
-		<p style="font-style: italic">Driving a 2009 Volkswagen Polo Match 1.4 80hp</p>
+		<div id="dplus-pref-car" style="font-style: italic"></div>
 	</div>
 
 	<div id="bd">
