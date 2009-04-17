@@ -14,6 +14,7 @@ var EXTRA_URBAN_AVERAGE = 39; // average speed in extra urban cycle
  * Default values are for a 2009 Volkswagen Polo Match 1.4 80hp.
  */
 var preference = {
+		owner:				"Piggy",
 		car_desc:			"2009 Volkswagen Polo Match 1.4 80hp",
 		urban_mpg:			34.0,
 		extra_urban_mpg:	54.3,
@@ -298,6 +299,7 @@ function savePref() {
 }
 
 function updateUIPref() {
+	document.getElementById("dplus-pref-title").innerHTML = preference.owner + "'s Direction+";
 	document.getElementById("dplus-pref-car").innerHTML = "Driving a " + preference.car_desc;
     document.getElementById("dplus-input-price").value = preference.fuel_price;
 }
