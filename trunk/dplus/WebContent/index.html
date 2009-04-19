@@ -5,20 +5,63 @@
 
 <!-- css -->
 <link rel="stylesheet" href="http://yui.yahooapis.com/2.7.0/build/reset-fonts-grids/reset-fonts-grids.css" type="text/css"> 
+<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.7.0/build/container/assets/skins/sam/container.css">
 <link rel="stylesheet" type="text/css" href="./css/dplus.css">
-	
+
+<style>
+label {
+	display: block;
+	float: left;
+	width: 45%;
+	clear: left;
+	text-align: left;
+}
+.clear {
+	clear: both;
+}
+</style>
+ 
 <!-- javascript -->
 <script type="text/javascript" src="http://maps.google.com/maps?file=api&v=2.x&key=ABQIAAAAj1DqbVODIwfxFozz52vGCBRPYLDdswWYK9xsZ4JkfD5EIBXtmBR4w43TwAtsEfHquR61hzgrmd2xQg"></script>
 <script type="text/javascript" src="http://www.google.com/uds/api?file=uds.js&v=1.0&key=ABQIAAAAj1DqbVODIwfxFozz52vGCBRPYLDdswWYK9xsZ4JkfD5EIBXtmBR4w43TwAtsEfHquR61hzgrmd2xQg"></script>
 <script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/yahoo/yahoo-min.js"></script> 
-<script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/cookie/cookie-min.js"></script> 
+<script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/cookie/cookie-min.js"></script>
+<script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/dom/dom-min.js"></script> 
+<script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/event/event-min.js"></script> 
+<script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/container/container-min.js"></script>
 <script type="text/javascript" src="./js/dplus.js"></script>
 
 <title>Direction+</title>
 </head>
 
-<body onload="initialise()" onunload="terminate()" >
+<body class="yui-skin-sam" onload="initialise()" onunload="terminate()" >
 
+<!-- Help -->
+<div id="dplus-dialog-help">
+    <div class="hd">Direction+ Help</div>
+    <div class="bd">
+        <p>Help goes here ...</p>
+    </div>
+</div>
+
+<!-- Change car -->
+<div id="dplus-dialog-car">
+	<div class="hd">Change Your Car Preference</div>
+	<div class="bd">
+		<form>
+			<label for="owner">Owner:</label><input type="text" name="owner" id="dplus-car-owner">
+			<label for="car_desc">Car Description:</label><input type="text" name="car_desc" id="dplus-car-desc">
+			<label for="urban_mpg">Urban MPG:</label><input type="text" name="urban_mpg" id="dplus-car-urban">
+			<label for="extra_urban_mpg">Extra Urban MPG:</label><input type="text" name="extra_urban_mpg" id="dplus-car-extra">
+			<label for="combined_mpg">Combined MPG:</label><input type="text" name="combined_mpg" id="dplus-car-combined">
+			<div class="clear"></div>
+			<input type="button" value="Save" onclick="saveCarDialog()">
+			<input type="button" value="Close" onclick="closeCarDialog()">
+		</form>
+	</div>
+</div>
+
+<!-- Direction+ -->
 <div id="doc3" class="yui-t5">
 	<div id="hd" style="text-align: center; margin-bottom: 1em; margin-top: 1em;">
 		<div id="dplus-pref-title" style="text-align: center; font-size: x-large; margin-bottom: 0.2em; color: blue;">Direction+</div>

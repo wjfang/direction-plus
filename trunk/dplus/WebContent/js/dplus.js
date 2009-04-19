@@ -49,6 +49,10 @@ function initialise() {
     loadPref();
     
     updateUIPref();
+    
+    initHelpDialog();
+    
+    initCarDialog();
 }
 
 function terminate() {
@@ -272,19 +276,6 @@ function calcFuelCost(fuel) {
 }
 
 /*
- * Help and change car buttons
- */
-function help() {
-	window.open("./help.html", "", 
-			"toolbar=0, scrollbars=1, location=0, statusbar=0, menubar=0, resizable=0, width=640, height=480");	
-}
-
-function changeCar() {
-	window.open("./car.html", "",
-			"toolbar=0, scrollbars=1, location=0, statusbar=0, menubar=0, resizable=0, width=640, height=480");
-}
-
-/*
  * Preference management based on cookie
  */
 function loadPref() {
@@ -302,4 +293,71 @@ function updateUIPref() {
 	document.getElementById("dplus-pref-title").innerHTML = preference.owner + "'s Direction+";
 	document.getElementById("dplus-pref-car").innerHTML = "Driving a " + preference.car_desc;
     document.getElementById("dplus-input-price").value = preference.fuel_price;
+}
+
+/*
+ * Help dialog
+ */
+var helpDialog;
+
+function initHelpDialog() {
+	helpDialog = new YAHOO.widget.Dialog("dplus-dialog-help", 
+			{ width : "60em",
+			  visible : false,
+			  fixedcenter: true,
+			  modal: true,
+			  constraintoviewport : true
+			});
+	helpDialog.render();
+}
+
+function help() {
+	helpDialog.show();	
+}
+
+/*
+ * Change car dialog
+ */
+var carDialog;
+
+function initCarDialog() {
+	carDialog = new YAHOO.widget.Dialog("dplus-dialog-car", 
+			{ width : "24em",
+			  visible : false,
+			  fixedcenter: true,
+			  modal: true,
+			  constraintoviewport : true
+			});
+	
+	carDialog.render();
+}
+
+function changeCar() {
+	document.getElementById("dplus-car-owner").value = preference.owner;
+	document.getElementById("dplus-car-desc").value = preference.car_desc;
+	document.getElementById("dplus-car-urban").value = preference.urban_mpg;
+	document.getElementById("dplus-car-extra").value = preference.extra_urban_mpg;
+	document.getElementById("dplus-car-combined").value = preference.combined_mpg;
+	carDialog.show();
+}
+
+function saveCarDialog() {
+	// Check if MPGs are numbers.
+	var data = carDialog.getData();
+	if (isNaN(data.urban_mpg) || isNaN(data.extra_urban_mpg) || isNaN(data.combined_mpg)) {
+		alert("MPGs must be numbers.");
+		return;
+	}
+	
+	preference.owner = document.getElementById("dplus-car-owner").value;
+	preference.car_desc = document.getElementById("dplus-car-desc").value;
+	preference.urban_mpg = document.getElementById("dplus-car-urban").value;
+	preference.extra_urban_mpg = document.getElementById("dplus-car-extra").value;
+	preference.combined_mpg = document.getElementById("dplus-car-combined").value;
+	closeCarDialog();
+	updateUIPref();
+}
+
+function closeCarDialog() {
+	carDialog.hide();
 }
