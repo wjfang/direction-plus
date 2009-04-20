@@ -43,6 +43,9 @@ http://code.google.com/p/direction-plus/
 
 This is also the Google AJAX Search API key.
 
+ABQIAAAAj1DqbVODIwfxFozz52vGCBTjVrl75TqAeOSnYEtAQbFma9R-CBTFTT2D1Wv3b7hEWenNomPzZPPdgg
+http://users.ecs.soton.ac.uk/wf/dplus/
+
 ================================================
 Issues
 ================================================
