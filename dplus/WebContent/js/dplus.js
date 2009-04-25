@@ -44,6 +44,7 @@ function initialise() {
     GEvent.addListener(directions, "error", handleErrors);
     
     localSearch = new GlocalSearch();
+    localSearch.setCenterPoint("London, UK");
     
 //    alert(document.cookie);
     loadPref();
@@ -71,13 +72,8 @@ function navigate() {
 		return;
 	}
 	
-	if (!document.getElementById("dplus-input-postcode").checked) {
-		var query = "from: " + from.value + " to: " + to.value;
-		directions.load(query);
-		return;
-	}
-	
-	// Now we assume both from and to are uk postcode. TODO: need to check.
+	// first use localSearch to locate the (latitude, longitude) of from and to,
+	// then find the route between them.
 	localSearch.setSearchCompleteCallback(null, function() {
 		if (localSearch.results[0]) {
 			var resultLat = localSearch.results[0].lat;
@@ -161,21 +157,18 @@ function updatePrice(inc) {
 /*
  * The number of times travelling along the route
  */
-var lastTripElement;
+var savedTripNum;
 var singleTripElement;
 var tripNumElement;
 
 function initTripNumChoice() {
-	if (lastTripElement == undefined)
-		lastTripElement = document.getElementById("dplus-info-lasttrip");
-	
 	if (singleTripElement == undefined)
 		singleTripElement = document.getElementById("dplus-info-single");
 	
 	if (tripNumElement == undefined)
 		tripNumElement = document.getElementById("dplus-info-tripnum");
 
-	lastTripElement.value = 1;
+	savedTripNum = 1;
 	singleTripElement.checked = true;
 	tripNumElement.value = 1;
 	tripNumElement.disabled = true;
@@ -199,9 +192,9 @@ function onTripNum() {
 }
 
 function updateTripNum(current) {
-	var last = lastTripElement.value;
+	var last = savedTripNum;
 	var ratio = current / last;
-	lastTripElement.value = current;
+	savedTripNum = current;
 	updateFuel(ratio);
 	tripNumElement.disabled = true;
 }
@@ -291,7 +284,7 @@ function savePref() {
 
 function updateUIPref() {
 	document.getElementById("dplus-pref-title").innerHTML = preference.owner + "'s Direction+";
-	document.getElementById("dplus-pref-car").innerHTML = "Driving a " + preference.car_desc;
+	document.getElementById("dplus-pref-car").innerHTML = preference.owner + " is driving a " + preference.car_desc + ".";
     document.getElementById("dplus-input-price").value = preference.fuel_price;
 }
 

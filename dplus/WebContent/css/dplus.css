@@ -1,1 +1,60 @@
 @CHARSET "ISO-8859-1";
+
+.dplus-car-prompt {
+	text-align: right;
+	padding-right: 1em;
+}
+
+#doc3 #hd {
+	text-align: center; 
+	margin-bottom: 1em; 
+	margin-top: 1em;
+}
+
+#doc3 #hd #dplus-pref-title {
+	text-align: center; 
+	font-size: x-large; 
+	margin-bottom: 0.2em; 
+	color: blue;
+}
+
+#doc3 #hd #dplus-pref-car {
+	font-style: italic;
+}
+
+#dplus-map {
+	width: 100%; 
+	height: 480px; 
+	border: 1px solid black;
+}
+
+.dplus-subtitle {
+	text-align: center; 
+	font-weight: bolder;
+	font-size: larger;
+}
+
+#dplus-info {
+	margin-top: 1em; 
+	display: none;
+}
+
+.dplus-info-table {
+	width: 100%;
+}
+
+.dplus-info-prompt {
+	font-weight: bold;	
+}
+
+#dplus-info-fuel, #dplus-info-cost {
+	color: red; 
+	font-weight: bold;	
+}
+
+#doc3 #ft {
+	text-align: center; 
+	font-style: italic; 
+	margin-bottom: 1em; 
+	margin-top: 1em;
+}

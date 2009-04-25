@@ -7,19 +7,6 @@
 <link rel="stylesheet" href="http://yui.yahooapis.com/2.7.0/build/reset-fonts-grids/reset-fonts-grids.css" type="text/css"> 
 <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.7.0/build/container/assets/skins/sam/container.css">
 <link rel="stylesheet" type="text/css" href="./css/dplus.css">
-
-<style>
-label {
-	display: block;
-	float: left;
-	width: 45%;
-	clear: left;
-	text-align: left;
-}
-.clear {
-	clear: both;
-}
-</style>
  
 <!-- javascript -->
 <script type="text/javascript" src="http://maps.google.com/maps?file=api&v=2.x&key=ABQIAAAAj1DqbVODIwfxFozz52vGCBTjVrl75TqAeOSnYEtAQbFma9R-CBTFTT2D1Wv3b7hEWenNomPzZPPdgg"></script>
@@ -49,24 +36,29 @@ label {
 	<div class="hd">Change Your Car Preference</div>
 	<div class="bd">
 		<form>
-			<label for="owner">Owner:</label><input type="text" name="owner" id="dplus-car-owner">
-			<label for="car_desc">Car Description:</label><input type="text" name="car_desc" id="dplus-car-desc">
-			<label for="urban_mpg">Urban MPG:</label><input type="text" name="urban_mpg" id="dplus-car-urban">
-			<label for="extra_urban_mpg">Extra Urban MPG:</label><input type="text" name="extra_urban_mpg" id="dplus-car-extra">
-			<label for="combined_mpg">Combined MPG:</label><input type="text" name="combined_mpg" id="dplus-car-combined">
-			<div class="clear"></div>
-			<input type="button" value="Save" onclick="saveCarDialog()">
-			<input type="button" value="Close" onclick="closeCarDialog()">
+			<table>
+				<tr><td class="dplus-car-prompt">Owner:</td><td><input type="text" id="dplus-car-owner"></td></tr>
+				<tr><td class="dplus-car-prompt">Car Description:</td><td><input type="text" id="dplus-car-desc"></td></tr>
+				<tr><td class="dplus-car-prompt">Urban MPG:</td><td><input type="text" id="dplus-car-urban"></td></tr>
+				<tr><td class="dplus-car-prompt">Extra Urban MPG:</td><td><input type="text" id="dplus-car-extra"></td></tr>
+				<tr><td class="dplus-car-prompt">Combined MPG:</td><td><input type="text" id="dplus-car-combined"></td></tr>
+				<tr>
+					<td></td>
+					<td>
+						<input type="button" value="Save" onclick="saveCarDialog()">
+						<input type="button" value="Close" onclick="closeCarDialog()">
+					</td>
+				</tr>
+			</table>
 		</form>
 	</div>
 </div>
 
 <!-- Direction+ -->
 <div id="doc3" class="yui-t5">
-	<div id="hd" style="text-align: center; margin-bottom: 1em; margin-top: 1em;">
-		<div id="dplus-pref-title" style="text-align: center; font-size: x-large; margin-bottom: 0.2em; color: blue;">Direction+</div>
+	<div id="hd">
+		<div id="dplus-pref-title">Direction+</div>
 		<form>
-			UK postcode <input id="dplus-input-postcode" type="checkbox">
 			From: <input id="dplus-input-from" type="text" size="20">
 			To: <input id="dplus-input-to" type="text" size="20">
 			Fuel price: <input type="button" value="&lt;" onclick="reducePrice()">
@@ -76,7 +68,7 @@ label {
 			<input type="button" value="Change Car" onclick="changeCar()">
 			<input type="button" value="Help" onclick="help()">
 		</form>
-		<div id="dplus-pref-car" style="font-style: italic"></div>
+		<div id="dplus-pref-car"></div>
 	</div>
 
 	<div id="bd">
@@ -84,26 +76,25 @@ label {
 			<div class="yui-b">
 				<div class="yui-gc">
 					<div class="yui-u first">
-						<div id="dplus-map" style="width: 100%; height: 480px; border: 1px solid black;"></div>
+						<div id="dplus-map"></div>
 					</div>
 					<div class="yui-u">
-						<div style="text-align: center; font-weight: bolder; font-size: larger;">Driving Directions</div>
-						<div id="dplus-route" style="border; 1px solid black;"></div>
+						<div class="dplus-subtitle">Driving Directions</div>
+						<div id="dplus-route"></div>
 					</div>
 				</div>
 			</div>
 		</div>
 		
 		<div class="yui-b">
-			<div style="text-align: center; font-weight: bolder; font-size: larger;">Plus Information</div>
-			<div id="dplus-info" style="margin-top: 1em; display: none;">
-			<table style="width: 100%;">
-				<tr><td style="font-weight: bold;">Fuel Consumption:</td><td id="dplus-info-fuel" style="color: red; font-weight: bold;">0</td><td>Litres</td></tr>
-				<tr><td style="font-weight: bold;">Fuel Cost:</td><td id="dplus-info-cost" style="color: red; font-weight: bold;">0</td><td>Pounds</td></tr>
+			<div class="dplus-subtitle">Plus Information</div>
+			<div id="dplus-info">
+			<table class="dplus-info-table">
+				<tr><td class="dplus-info-prompt">Fuel Consumption:</td><td id="dplus-info-fuel">0</td><td>Litres</td></tr>
+				<tr><td class="dplus-info-prompt">Fuel Cost:</td><td id="dplus-info-cost">0</td><td>Pounds</td></tr>
 			</table>
 			<br>
 			<p>How many times will you travel along the route?</p>
-			<input type="hidden" id="dplus-info-lasttrip">
 			<input type="radio" id="dplus-info-single" name="dplus-info-trip" value="single" onchange="onSingleTrip()"> Single <br>
 			<input type="radio" name="dplus-info-trip" value="return" onchange="onReturnTrip()"> Return <br> 
 			<input type="radio" name="dplus-info-trip" value="custom" onchange="onCustomTrip()"> Customise 
@@ -112,7 +103,7 @@ label {
 		</div>
 	</div>
 	
-	<div id="ft" style="text-align: center; font-style: italic; margin-bottom: 1em; margin-top: 1em;">
+	<div id="ft">
 		<p>&copy; Weijian Fang 2009</p>
 	</div>
 </div>
