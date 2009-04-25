@@ -54,6 +54,18 @@ GDirections does not understand UK postcode.
 See http://www.tomanthony.co.uk/blog/geocoding-uk-postcodes-with-google-map-api/
 
 ================================================
+TODOs
+================================================
+
+Object-oriented JavaScript.
+
+MVC.
+
+[DONE]Mix UK postcode and address.
+
+localSearch.setCenterPoint("...") should be configurable.
+
+================================================
 FUEL CONSUMPTION ALGORITHM
 ================================================
 
