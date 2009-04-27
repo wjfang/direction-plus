@@ -57,9 +57,9 @@ See http://www.tomanthony.co.uk/blog/geocoding-uk-postcodes-with-google-map-api/
 TODOs
 ================================================
 
-Object-oriented JavaScript.
+[DONE]Object-oriented JavaScript.
 
-MVC.
+[DONE]MVC.
 
 [DONE]Mix UK postcode and address.
 

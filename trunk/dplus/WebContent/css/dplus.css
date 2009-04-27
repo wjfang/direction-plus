@@ -1,6 +1,6 @@
 @CHARSET "ISO-8859-1";
 
-.dplus-car-prompt {
+.dplus-pref-prompt {
 	text-align: right;
 	padding-right: 1em;
 }
@@ -11,14 +11,14 @@
 	margin-top: 1em;
 }
 
-#doc3 #hd #dplus-pref-title {
+#doc3 #hd #dplus-title {
 	text-align: center; 
 	font-size: x-large; 
 	margin-bottom: 0.2em; 
 	color: blue;
 }
 
-#doc3 #hd #dplus-pref-car {
+#doc3 #hd #dplus-car {
 	font-style: italic;
 }
 
