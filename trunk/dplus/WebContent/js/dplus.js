@@ -22,10 +22,10 @@ function Preference(config) {
 	this.data = {
 		owner:					"Piggy",
 		car_desc:				"2009 Volkswagen Polo Match 1.4 80hp",
-		urban_mpg:				34.0,
-		extra_urban_mpg: 		54.3,
-		combined_mpg: 			44.8,
-		fuel_price:				92.9
+		urban_mpg:				new Number(34.0),
+		extra_urban_mpg: 		new Number(54.3),
+		combined_mpg: 			new Number(44.8),
+		fuel_price:				new Number(92.9)
 	};
 	
 	this.ownerElement = document.getElementById(config.prefOwnerId);
@@ -49,6 +49,14 @@ function Preference(config) {
 			});
 	
 	this.dialog.render();
+}
+
+Preference.prototype.getPrice = function() {
+	return this.data.fuel_price;	
+}
+
+Preference.prototype.save = function(p) {
+	this.data.fuel_price = p;	
 }
 
 Preference.prototype.load = function() {
@@ -118,10 +126,10 @@ Help.prototype.open = function() {
 /*
  * Price
  */
-function Price(priceId, dplus) {
+function Price(priceId, pref) {
 	this.priceElement = document.getElementById(priceId);
-	this.prefData = dplus.preference.data;
-	this.updateUI(this.prefData.fuel_price);
+	this.pref = pref;
+	this.updateUI(pref.getPrice());
 }
 
 Price.prototype.minus1p = function() {
@@ -133,8 +141,8 @@ Price.prototype.add1p = function() {
 }
 
 Price.prototype.update = function(inc) {
-	var p = parseFloat(this.prefData.fuel_price) + inc;
-	this.prefData.fuel_price = p;
+	var p = this.pref.getPrice() + inc;
+	this.pref.setPrice(p);
 	this.updateUI(p);	
 }
 
@@ -152,6 +160,8 @@ function Info(config) {
 	this.fuelElement = document.getElementById(config.fuelId);
 	this.costElement = document.getElementById(config.costId);
 	this.infoElement = document.getElementById(config.infoId);
+	this.cost = new Number;
+	this.fuel = new Number;
 }
 
 Info.prototype.reset = function() {
@@ -187,8 +197,14 @@ Info.prototype.updateTripNum = function(current) {
 }
 
 Info.prototype.updateFuel = function(ratio) {
-	this.fuelElement.innerHTML = (this.fuelElement.innerHTML * ratio).toFixed(2);
-	this.costElement.innerHTML = (this.costElement.innerHTML * ratio).toFixed(2);
+	this.cost *= ratio;
+	this.fuel *= ratio;
+	this.updateUI();
+}
+
+Info.prototype.updateUI = function() {
+	this.fuelElement.innerHTML = this.fuel.toFixed(2);
+	this.costElement.innerHTML = this.cost.toFixed(2);	
 }
 
 /*
@@ -219,7 +235,7 @@ function DPlus(config) {
     this.help = new Help(config.helpDialogId);
     
     // price
-    this.price = new Price(config.priceId, this);
+    this.price = new Price(config.priceId, this.preference);
     
     // info
     this.info = new Info(config.info);
@@ -309,7 +325,7 @@ DPlus.prototype.calcFuelCost = function(fuel) {
 }
 
 /*
- * Various callbacks
+ * Callbacks
  */
 function handleErrors() {
 	if (this.getStatus().code == G_GEO_UNKNOWN_ADDRESS)
@@ -356,10 +372,9 @@ function analyseRoute() {
 		fuel += dplus.calcFuelConsumption(speed, meters);
 	}
 	
-	dplus.info.fuelElement.innerHTML = fuel.toFixed(2);
+	dplus.info.fuel = fuel;	
+	dplus.info.cost = dplus.calcFuelCost(fuel);
 	
-	var cost = dplus.calcFuelCost(fuel);
-	dplus.info.costElement.innerHTML = cost.toFixed(2);
-	
+	dplus.info.updateUI();
 	dplus.info.reset();
 }
