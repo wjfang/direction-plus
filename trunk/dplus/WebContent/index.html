@@ -59,7 +59,8 @@ function initialise() {
 			fuelId:				"dplus-info-fuel",
 			costId:				"dplus-info-cost",
 			singleTripId:		"dplus-info-single",
-			tripNumId:			"dplus-info-tripnum"
+			tripNumId:			"dplus-info-tripnum",
+			tripSetId:			"dplus-info-tripset"
 		}
 		});
 }
@@ -150,7 +151,7 @@ function finalise() {
 			<input type="radio" name="dplus-info-trip" value="return" onclick="dplus.info.onReturnTrip()"> Return <br> 
 			<input type="radio" name="dplus-info-trip" value="custom" onclick="dplus.info.onCustomTrip()"> 
 			<input id="dplus-info-tripnum" type="text" size="1">
-			<input type="button" value="Set" onclick="dplus.info.onTripNum()"><br>
+			<input id="dplus-info-tripset" type="button" value="Set" onclick="dplus.info.onTripNum()"><br>
 			</div>
 		</div>
 	</div>
