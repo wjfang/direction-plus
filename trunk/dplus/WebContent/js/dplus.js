@@ -212,14 +212,24 @@ function DPlus(config) {
     map.enableScrollWheelZoom();
     var routeElement = document.getElementById(config.routeId);
     this.directions = new GDirections(map, routeElement);
-    // In order to access route information!
+    
+    // In order to access route information, need to add listener for event.
+    // Use closure to create callback triggered by event
+    var createCallBack = function(obj, method) {
+    	return function() {
+    		method.call(obj);
+    	};
+    };
+    
+    // Another way to do this is to use GEvent.callback(...) 
+    // var cb = GEvent.callback(this, this.analyseRoute);
+    
     // Registers an event handler for a custom event on the source object. 
     // Returns a handle that can be used to eventually deregister the handler. 
     // The event handler will be called with this set to the source object.
-    var cb = GEvent.callback(this, this.analyseRoute);
-    GEvent.addListener(this.directions, "load", cb);
-    cb = GEvent.callback(this, this.handleErrors);
-    GEvent.addListener(this.directions, "error", cb);
+    GEvent.addListener(this.directions, "load", createCallBack(this, this.analyseRoute));
+    // cb = GEvent.callback(this, this.handleErrors);
+    GEvent.addListener(this.directions, "error", createCallBack(this, this.handleErrors));
     
     // create a GlocalSearch instance
     this.localSearch = new GlocalSearch();
