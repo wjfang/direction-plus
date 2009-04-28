@@ -145,6 +145,7 @@ function Info(config) {
 	this.savedTripNum = 1;
 	this.singleTripElement = document.getElementById(config.singleTripId);
 	this.tripNumElement = document.getElementById(config.tripNumId);
+	this.tripSetElement = document.getElementById(config.tripSetId);
 	this.fuelElement = document.getElementById(config.fuelId);
 	this.costElement = document.getElementById(config.costId);
 	this.infoElement = document.getElementById(config.infoId);
@@ -158,21 +159,25 @@ Info.prototype.reset = function() {
 	this.singleTripElement.checked = true;
 	this.tripNumElement.value = 1;
 	this.tripNumElement.disabled = true;
+	this.tripSetElement.disabled = true;
 }
 
 Info.prototype.onSingleTrip = function() {
 	this.updateTripNum(1);
 	this.tripNumElement.disabled = true;
+	this.tripSetElement.disabled = true;
 }
 
 Info.prototype.onReturnTrip = function() {
 	this.updateTripNum(2);
 	this.tripNumElement.disabled = true;
+	this.tripSetElement.disabled = true;
 }
 
 Info.prototype.onCustomTrip = function() {
 	this.updateTripNum(this.tripNumElement.value);
 	this.tripNumElement.disabled = false;
+	this.tripSetElement.disabled = false;
 }
 
 Info.prototype.onTripNum = function() {
