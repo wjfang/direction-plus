@@ -7,11 +7,6 @@ var URBAN_AVERAGE = 12; // average speed in urban cycle
 var EXTRA_URBAN_AVERAGE = 39; // average speed in extra urban cycle
 
 /*
- * The object
- */
-var dplus;
-
-/*
  * Preference
  * Car description
  * MPG (mile per gallon): urban, extra urban, combined
@@ -221,8 +216,10 @@ function DPlus(config) {
     // Registers an event handler for a custom event on the source object. 
     // Returns a handle that can be used to eventually deregister the handler. 
     // The event handler will be called with this set to the source object.
-    GEvent.addListener(this.directions, "load", analyseRoute);
-    GEvent.addListener(this.directions, "error", handleErrors);
+    var cb = GEvent.callback(this, this.analyseRoute);
+    GEvent.addListener(this.directions, "load", cb);
+    cb = GEvent.callback(this, this.handleErrors);
+    GEvent.addListener(this.directions, "error", cb);
     
     // create a GlocalSearch instance
     this.localSearch = new GlocalSearch();
@@ -248,6 +245,57 @@ function DPlus(config) {
 
 DPlus.prototype.destroy = function() {
 	this.preference.save();
+}
+
+DPlus.prototype.handleErrors = function() {
+	var code = this.directions.getStatus().code;
+	if (code == G_GEO_UNKNOWN_ADDRESS)
+		alert("No corresponding geographic location could be found for one of the specified addresses. " +
+				"This may be due to the fact that the address is relatively new, or it may be incorrect.\nError code: "
+				+ code);
+	else if (code == G_GEO_SERVER_ERROR)
+		alert("A geocoding or directions request could not be successfully processed, " +
+				"yet the exact reason for the failure is not known.\n Error code: "
+				+ code);
+	else if (code == G_GEO_MISSING_QUERY)
+		alert("The HTTP q parameter was either missing or had no value. For geocoder requests, " +
+				"this means that an empty address was specified as input. For directions requests, " +
+				"this means that no query was specified in the input.\n Error code: "
+				+ code);
+
+	// else if (gdir.getStatus().code == G_UNAVAILABLE_ADDRESS) <--- Doc bug...
+	// this is either not defined, or Doc is wrong
+	// alert("The geocode for the given address or the route for the given
+	// directions query cannot be returned due to legal or contractual
+	// reasons.\n Error code: " + gdir.getStatus().code);
+
+	else if (code == G_GEO_BAD_KEY)
+		alert("The given key is either invalid or does not match the domain for which it was given. \n Error code: "
+				+ code);
+	else if (code == G_GEO_BAD_REQUEST)
+		alert("A directions request could not be successfully parsed.\n Error code: "
+				+ code);
+	else
+		alert("Sorry, no route can be found!");
+}
+
+DPlus.prototype.analyseRoute = function() {
+	var route = this.directions.getRoute(0);
+	var fuel = 0; // fuel in litres
+	
+	for (var i = 0; i < route.getNumSteps(); i++) {
+		var step = route.getStep(i);
+		var meters = step.getDistance().meters;
+		var seconds = step.getDuration().seconds;
+		var speed = (meters / MPM) / (seconds / 3600);
+		fuel += this.calcFuelConsumption(speed, meters);
+	}
+	
+	this.info.fuel = fuel;	
+	this.info.cost = this.calcFuelCost(fuel);
+	
+	this.info.updateUI();
+	this.info.reset();
 }
 
 // Google Maps 
@@ -322,59 +370,4 @@ DPlus.prototype.calcGallon2 = function(speed, miles) {
 DPlus.prototype.calcFuelCost = function(fuel) {
 	var p = this.preference.data.fuel_price;
 	return fuel * (p / 100);
-}
-
-/*
- * Callbacks
- */
-function handleErrors() {
-	if (this.getStatus().code == G_GEO_UNKNOWN_ADDRESS)
-		alert("No corresponding geographic location could be found for one of the specified addresses. " +
-				"This may be due to the fact that the address is relatively new, or it may be incorrect.\nError code: "
-				+ this.getStatus().code);
-	else if (this.getStatus().code == G_GEO_SERVER_ERROR)
-		alert("A geocoding or directions request could not be successfully processed, " +
-				"yet the exact reason for the failure is not known.\n Error code: "
-				+ this.getStatus().code);
-	else if (this.getStatus().code == G_GEO_MISSING_QUERY)
-		alert("The HTTP q parameter was either missing or had no value. For geocoder requests, " +
-				"this means that an empty address was specified as input. For directions requests, " +
-				"this means that no query was specified in the input.\n Error code: "
-				+ this.getStatus().code);
-
-	// else if (gdir.getStatus().code == G_UNAVAILABLE_ADDRESS) <--- Doc bug...
-	// this is either not defined, or Doc is wrong
-	// alert("The geocode for the given address or the route for the given
-	// directions query cannot be returned due to legal or contractual
-	// reasons.\n Error code: " + gdir.getStatus().code);
-
-	else if (this.getStatus().code == G_GEO_BAD_KEY)
-		alert("The given key is either invalid or does not match the domain for which it was given. \n Error code: "
-				+ this.getStatus().code);
-	else if (this.getStatus().code == G_GEO_BAD_REQUEST)
-		alert("A directions request could not be successfully parsed.\n Error code: "
-				+ this.getStatus().code);
-	else
-		alert("An unknown error occurred.");
-}
-
-
-function analyseRoute() {
-	var route = this.getRoute(0);
-	var fuel = 0; // fuel in litres
-	
-	for (var i = 0; i < route.getNumSteps(); i++) {
-		var step = route.getStep(i);
-		var meters = step.getDistance().meters;
-		var seconds = step.getDuration().seconds;
-		var speed = (meters / MPM) / (seconds / 3600);
-		// here we can use dplus because dplus is defined as a global object.
-		fuel += dplus.calcFuelConsumption(speed, meters);
-	}
-	
-	dplus.info.fuel = fuel;	
-	dplus.info.cost = dplus.calcFuelCost(fuel);
-	
-	dplus.info.updateUI();
-	dplus.info.reset();
 }
