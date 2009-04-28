@@ -146,10 +146,11 @@ function finalise() {
 			</table>
 			<br>
 			<p>How many times will you travel along the route?</p>
-			<input type="radio" id="dplus-info-single" name="dplus-info-trip" value="single" onchange="dplus.info.onSingleTrip()"> Single <br>
-			<input type="radio" name="dplus-info-trip" value="return" onchange="dplus.info.onReturnTrip()"> Return <br> 
-			<input type="radio" name="dplus-info-trip" value="custom" onchange="dplus.info.onCustomTrip()"> Customise 
-			<input id="dplus-info-tripnum" type="text" size="1" onchange="dplus.info.onTripNum()"> <br>
+			<input type="radio" id="dplus-info-single" name="dplus-info-trip" value="single" onclick="dplus.info.onSingleTrip()"> Single <br>
+			<input type="radio" name="dplus-info-trip" value="return" onclick="dplus.info.onReturnTrip()"> Return <br> 
+			<input type="radio" name="dplus-info-trip" value="custom" onclick="dplus.info.onCustomTrip()"> 
+			<input id="dplus-info-tripnum" type="text" size="1">
+			<input type="button" value="Set" onclick="dplus.info.onTripNum()"><br>
 			</div>
 		</div>
 	</div>

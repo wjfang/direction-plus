@@ -46,14 +46,6 @@ function Preference(config) {
 	this.dialog.render();
 }
 
-Preference.prototype.getPrice = function() {
-	return this.data.fuel_price;	
-}
-
-Preference.prototype.save = function(p) {
-	this.data.fuel_price = p;	
-}
-
 Preference.prototype.load = function() {
 	var pref = YAHOO.util.Cookie.getSubs("dplus");
 	if (pref != null) {
@@ -121,10 +113,11 @@ Help.prototype.open = function() {
 /*
  * Price
  */
-function Price(priceId, pref) {
+function Price(priceId, getPriceFunc, setPriceFunc) {
 	this.priceElement = document.getElementById(priceId);
-	this.pref = pref;
-	this.updateUI(pref.getPrice());
+	this.getPrice = getPriceFunc;
+	this.setPrice = setPriceFunc;
+	this.updateUI(this.getPrice());
 }
 
 Price.prototype.minus1p = function() {
@@ -136,8 +129,8 @@ Price.prototype.add1p = function() {
 }
 
 Price.prototype.update = function(inc) {
-	var p = this.pref.getPrice() + inc;
-	this.pref.setPrice(p);
+	var p = parseFloat(this.getPrice()) + inc;
+	this.setPrice(p);
 	this.updateUI(p);	
 }
 
@@ -169,10 +162,12 @@ Info.prototype.reset = function() {
 
 Info.prototype.onSingleTrip = function() {
 	this.updateTripNum(1);
+	this.tripNumElement.disabled = true;
 }
 
 Info.prototype.onReturnTrip = function() {
 	this.updateTripNum(2);
+	this.tripNumElement.disabled = true;
 }
 
 Info.prototype.onCustomTrip = function() {
@@ -232,7 +227,14 @@ function DPlus(config) {
     this.help = new Help(config.helpDialogId);
     
     // price
-    this.price = new Price(config.priceId, this.preference);
+    var prefdata = this.preference.data;
+    this.price = new Price(config.priceId,
+    		function() {
+    			return prefdata.fuel_price;
+    		},
+    		function(p) {
+    			prefdata.fuel_price = p;
+    		});
     
     // info
     this.info = new Info(config.info);
