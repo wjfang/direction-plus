@@ -114,7 +114,7 @@ function finalise() {
 			From: <input id="dplus-from" type="text" size="20">
 			To: <input id="dplus-to" type="text" size="20">
 			Fuel price: <input type="button" value="&lt;" onclick="dplus.price.minus1p()">
-			<input id="dplus-price" type="text" size="1" readonly="readonly">p
+			<input id="dplus-price" type="text" readonly="readonly" size="4" style="text-align: right">p
 			<input type="button" value="&gt;" onclick="dplus.price.add1p()">			
 			<input type="button" value="Navigate" onclick="dplus.navigate()">
 			<input type="button" value="Change Car" onclick="dplus.preference.openDialog()">
@@ -150,7 +150,7 @@ function finalise() {
 			<input type="radio" id="dplus-info-single" name="dplus-info-trip" value="single" onclick="dplus.info.onSingleTrip()"> Single <br>
 			<input type="radio" name="dplus-info-trip" value="return" onclick="dplus.info.onReturnTrip()"> Return <br> 
 			<input type="radio" name="dplus-info-trip" value="custom" onclick="dplus.info.onCustomTrip()"> 
-			<input id="dplus-info-tripnum" type="text" size="1">
+			<input id="dplus-info-tripnum" type="text" size="4">
 			<input id="dplus-info-tripset" type="button" value="Set" onclick="dplus.info.onTripNum()"><br>
 			</div>
 		</div>
