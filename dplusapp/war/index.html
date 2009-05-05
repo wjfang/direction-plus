@@ -1,0 +1,165 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Strict//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+
+<!-- css -->
+<!-- 
+<link rel="stylesheet" href="http://yui.yahooapis.com/2.7.0/build/reset-fonts-grids/reset-fonts-grids.css" type="text/css"> 
+<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.7.0/build/container/assets/skins/sam/container.css">
+-->
+<!-- Combo-handled YUI CSS files: --> 
+<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/combo?2.7.0/build/reset-fonts-grids/reset-fonts-grids.css&2.7.0/build/container/assets/skins/sam/container.css"> 
+
+<link rel="stylesheet" type="text/css" href="./css/dplus.css">
+ 
+<!-- javascript -->
+<script type="text/javascript" src="http://maps.google.com/maps?file=api&v=2.x&key=ABQIAAAAj1DqbVODIwfxFozz52vGCBTBKtqaU_qKk-cwvy6tFS36W-EYRhTQIx4Jc7ffCTqfgjkPZSJocVxSCA"></script>
+<script type="text/javascript" src="http://www.google.com/uds/api?file=uds.js&v=1.0&key=ABQIAAAAj1DqbVODIwfxFozz52vGCBTBKtqaU_qKk-cwvy6tFS36W-EYRhTQIx4Jc7ffCTqfgjkPZSJocVxSCA"></script>
+<!-- 
+<script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/yahoo/yahoo-min.js"></script> 
+<script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/cookie/cookie-min.js"></script>
+<script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/dom/dom-min.js"></script> 
+<script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/event/event-min.js"></script> 
+<script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/container/container-min.js"></script>
+-->
+<!-- Combo-handled YUI JS files: --> 
+<script type="text/javascript" src="http://yui.yahooapis.com/combo?2.7.0/build/yahoo-dom-event/yahoo-dom-event.js&2.7.0/build/container/container-min.js&2.7.0/build/cookie/cookie-min.js"></script> 
+
+<script type="text/javascript" src="./js/dplus.js"></script>
+
+<script type="text/javascript">
+var dplus;
+
+function initialise() {
+	dplus = new DPlus({
+		// help
+		helpDialogId:		"dplus-help-dialog",
+		// preference
+		pref:	{
+			prefDialogId:		"dplus-pref-dialog",
+			prefOwnerId:		"dplus-pref-owner",
+			prefDescId:			"dplus-pref-desc",
+			prefUrbanId:		"dplus-pref-urban",
+			prefExtraId:		"dplus-pref-extra",
+			prefCombinedId:		"dplus-pref-combined",
+			titleId:			"dplus-title",
+			carId:				"dplus-car"				
+		},
+		// main
+		fromId:				"dplus-from",
+		toId:				"dplus-to",
+		mapId:				"dplus-map",
+		routeId:			"dplus-route",
+		// price
+		priceId:			"dplus-price",
+		// info
+		info: {
+			infoId:				"dplus-info",
+			fuelId:				"dplus-info-fuel",
+			costId:				"dplus-info-cost",
+			singleTripId:		"dplus-info-single",
+			tripNumId:			"dplus-info-tripnum",
+			tripSetId:			"dplus-info-tripset"
+		}
+		});
+}
+
+function finalise() {
+	dplus.destroy();
+}
+</script>
+
+<title>Direction+</title>
+</head>
+
+<body class="yui-skin-sam" onload="initialise()" onunload="finalise()" >
+
+<!-- Help -->
+<div id="dplus-help-dialog">
+    <div class="hd">Direction+ Help</div>
+    <div class="bd">
+        <p>Help goes here ...</p>
+    </div>
+</div>
+
+<!-- Change car -->
+<div id="dplus-pref-dialog">
+	<div class="hd">Change Your Car Preference</div>
+	<div class="bd">
+		<form>
+			<table>
+				<tr><td class="dplus-pref-prompt">Owner:</td><td><input type="text" name="owner" id="dplus-pref-owner"></td></tr>
+				<tr><td class="dplus-pref-prompt">Car Description:</td><td><input type="text" name="car_desc" id="dplus-pref-desc"></td></tr>
+				<tr><td class="dplus-pref-prompt">Urban MPG:</td><td><input type="text" name="urban_mpg" id="dplus-pref-urban"></td></tr>
+				<tr><td class="dplus-pref-prompt">Extra Urban MPG:</td><td><input type="text" name="extra_urban_mpg" id="dplus-pref-extra"></td></tr>
+				<tr><td class="dplus-pref-prompt">Combined MPG:</td><td><input type="text" name="combined_mpg" id="dplus-pref-combined"></td></tr>
+				<tr>
+					<td></td>
+					<td>
+						<input type="button" value="Save" onclick="dplus.preference.saveDialog()">
+						<input type="button" value="Close" onclick="dplus.preference.closeDialog()">
+					</td>
+				</tr>
+			</table>
+		</form>
+	</div>
+</div>
+
+<!-- Main -->
+<div id="doc3" class="yui-t5">
+	<div id="hd">
+		<div id="dplus-title"></div>
+		<form>
+			From: <input id="dplus-from" type="text" size="20">
+			To: <input id="dplus-to" type="text" size="20">
+			Fuel price: <input type="button" value="&lt;" onclick="dplus.price.minus1p()">
+			<input id="dplus-price" type="text" readonly="readonly" size="4" style="text-align: right">p
+			<input type="button" value="&gt;" onclick="dplus.price.add1p()">			
+			<input type="button" value="Navigate" onclick="dplus.navigate()">
+			<input type="button" value="Change Car" onclick="dplus.preference.openDialog()">
+			<input type="button" value="Help" onclick="dplus.help.open()">
+		</form>
+		<div id="dplus-car"></div>
+	</div>
+
+	<div id="bd">
+		<div id="yui-main">
+			<div class="yui-b">
+				<div class="yui-gc">
+					<div class="yui-u first">
+						<div id="dplus-map"></div>
+					</div>
+					<div class="yui-u">
+						<div class="dplus-subtitle">Driving Directions</div>
+						<div id="dplus-route"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div class="yui-b">
+			<div class="dplus-subtitle">Plus Information</div>
+			<div id="dplus-info">
+			<table class="dplus-info-table">
+				<tr><td class="dplus-info-prompt">Fuel Consumption:</td><td id="dplus-info-fuel">0</td><td>Litres</td></tr>
+				<tr><td class="dplus-info-prompt">Fuel Cost:</td><td id="dplus-info-cost">0</td><td>Pounds</td></tr>
+			</table>
+			<br>
+			<p>How many times will you travel along the route?</p>
+			<input type="radio" id="dplus-info-single" name="dplus-info-trip" value="single" onclick="dplus.info.onSingleTrip()"> Single <br>
+			<input type="radio" name="dplus-info-trip" value="return" onclick="dplus.info.onReturnTrip()"> Return <br> 
+			<input type="radio" name="dplus-info-trip" value="custom" onclick="dplus.info.onCustomTrip()"> 
+			<input id="dplus-info-tripnum" type="text" size="4">
+			<input id="dplus-info-tripset" type="button" value="Set" onclick="dplus.info.onTripNum()"><br>
+			</div>
+		</div>
+	</div>
+	
+	<div id="ft">
+		<p>&copy; Weijian Fang 2009</p>
+	</div>
+</div>
+
+</body>
+</html>
