@@ -1,0 +1,31 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Strict//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+
+<script type="text/javascript">
+function Parent() {
+	this.me = "parent";
+}
+
+function Child() {
+	
+}
+
+Child.prototype = parent;
+
+function test() {
+	var parent = new Parent();
+	var child = new Child();
+	alert(child.me);	
+	child.me = "child";
+	alert(child.me);
+	alert(parent.me);
+}
+</script>
+
+<title>Test Case 002 - Prototype Chaining</title>
+</head>
+<body onload="test()">
+</body>
+</html>

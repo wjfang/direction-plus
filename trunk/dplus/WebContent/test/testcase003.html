@@ -1,0 +1,53 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Strict//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+
+<script type="text/javascript">
+function callLater(paramA, paramB, paramC){
+    /* Return a reference to an anonymous inner function created
+       with a function expression:-
+    */
+    return (function(){
+        /* This inner function is to be executed with - setTimeout
+           - and when it is executed it can read, and act upon, the
+           parameters passed to the outer function:-
+        */
+        paramA[paramB] = paramC;
+    });
+}
+
+function test() {
+	var el = document.getElementById("hd");
+	var functRef = callLater(el.style, "display", "none");
+	setTimeout(functRef, 5000);	
+}
+
+function test2() {
+	var el = document.getElementById("hd");
+	setTimeout(
+		function() {
+			el.style.display = "none";
+		}, 
+		1000);	
+}
+
+// DOES NOT WORK because setTimeout asks for a function reference/declaration 
+// instead of a function invocation that returns a value
+function test3() {
+	var el = document.getElementById("hd");
+	setTimeout(
+		(function(style) {
+			el.style.display = style;
+		})("none"), 
+		1000);	
+}
+
+</script>
+
+<title>Test Case 003 - Clousure and setTimeout</title>
+</head>
+<body onload="test2()">
+<h1 id="hd">Hello world</h1>
+</body>
+</html>

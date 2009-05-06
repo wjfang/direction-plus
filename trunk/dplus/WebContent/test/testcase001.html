@@ -1,0 +1,31 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Strict//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+
+<script type="text/javascript">
+function callback(msg) {
+	alert(msg);
+}
+
+function test0(func, arg) {
+	func(arg);	
+}
+
+function test1(func) {
+	/*
+	alert(arguments);
+	alert(arguments.length);
+	for (var i = 0; i < arguments.length; i++)
+		alert(arguments[i]);
+	*/
+	var arr = Array.prototype.slice.call(arguments);
+	func(arr.slice(1, arguments.length));
+}
+</script>
+
+<title>Test Case 001</title>
+</head>
+<body onload="test1(callback, 'hello world!')">
+</body>
+</html>
