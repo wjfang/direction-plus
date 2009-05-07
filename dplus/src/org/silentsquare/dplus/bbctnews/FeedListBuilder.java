@@ -88,6 +88,12 @@ public class FeedListBuilder {
 		}
 		for (int i = 0; i < nl.getLength(); i++) {
 			Element outline = (Element) nl.item(i);
+			/*
+			 * Only handle news in English
+			 */
+			String language = outline.getAttribute("language");
+			if (!"en".equals(language))
+				continue;
 			String text = outline.getAttribute("text");
 			logger.debug(text);
 			String ss[] = text.split("\\|");

@@ -16,9 +16,9 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 
-public class NewsDatabase {
+public class NewsReader {
 	
-	private static final Logger logger = Logger.getLogger(NewsDatabase.class); 
+	private static final Logger logger = Logger.getLogger(NewsReader.class); 
 	
 	private List<News> newsList = new ArrayList<News>();
 	
@@ -26,14 +26,14 @@ public class NewsDatabase {
 	
 	private ResourceBundle feedUrlBundle;
 	
-	public NewsDatabase() throws SAXException {
+	public NewsReader() throws SAXException {
 		this.xmlParser = XMLReaderFactory.createXMLReader();		
-		this.xmlParser.setContentHandler(new NewsContentHandler(this.newsList));
+		this.xmlParser.setContentHandler(new FeedContentHandler(this.newsList));
 		
 		this.feedUrlBundle = ResourceBundle.getBundle("feeds"); 
 	}
 	
-	public NewsDatabase build() {
+	public NewsReader read() {
 		for (String key : feedUrlBundle.keySet()) {
 			logger.debug(key);
 			String url = feedUrlBundle.getString(key);
@@ -68,7 +68,7 @@ public class NewsDatabase {
 	 */
 	public static void main(String[] args) throws Exception {
 		long start = System.currentTimeMillis();
-		System.out.println(new NewsDatabase().build().size());
+		System.out.println(new NewsReader().read().size());
 		System.out.println((System.currentTimeMillis() - start) + "ms");
 	}
 
@@ -77,7 +77,10 @@ ERROR: org.silentsquare.dplus.bbctnews.NewsDatabase.build(NewsDatabase.java:45)
  java.io.FileNotFoundException: http://www.bbc.co.uk/travelnews/tpeg/cy/regions/rtm/wales_rss.xml
 ERROR: org.silentsquare.dplus.bbctnews.NewsDatabase.build(NewsDatabase.java:45)
  java.io.FileNotFoundException: http://www.bbc.co.uk/travelnews/tpeg/en/pti/swanseacorkferries_rss.xml
-2394
-26578ms
+2393
+475532ms
+490157ms
+583219ms
+481281ms
 	 */
 }
