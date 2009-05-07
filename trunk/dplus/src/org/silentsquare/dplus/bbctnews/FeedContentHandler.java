@@ -9,9 +9,9 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-class NewsContentHandler extends DefaultHandler {
+class FeedContentHandler extends DefaultHandler {
 	
-	private static final Logger logger = Logger.getLogger(NewsContentHandler.class); 
+	private static final Logger logger = Logger.getLogger(FeedContentHandler.class); 
 	
 	private List<News> newsList;
 	
@@ -21,7 +21,7 @@ class NewsContentHandler extends DefaultHandler {
 	
 	private CoordinateFinder coordinateFinder = new CoordinateFinder();
 	
-	NewsContentHandler(List<News> newsList) {
+	FeedContentHandler(List<News> newsList) {
 		this.newsList = newsList;
 	}
 	

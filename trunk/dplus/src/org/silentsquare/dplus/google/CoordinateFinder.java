@@ -22,8 +22,9 @@ public class CoordinateFinder {
 	private static final Logger logger = Logger.getLogger(CoordinateFinder.class);
 	
 	public static final String ENDPOINT_URL_PREFIX = 
-		"http://maps.google.com/maps/geo?output=json&oe=utf8&sensor=false&" +
-		"key=ABQIAAAAj1DqbVODIwfxFozz52vGCBRPYLDdswWYK9xsZ4JkfD5EIBXtmBR4w43TwAtsEfHquR61hzgrmd2xQg&q=";
+		"http://maps.google.com/maps/geo?output=json&oe=utf8&sensor=false&q=";
+	
+	private int optimalPause = 16; // in milliseconds
 	
 	public CoordinateFinder() {
 		
@@ -40,7 +41,7 @@ public class CoordinateFinder {
 		return ENDPOINT_URL_PREFIX + searchString;
 	}
 	
-	private JSONObject _search(String searchString) {
+	private JSONObject call(String searchString) {
 		URLConnection uc;
 		try {
 			uc = new URL(generateUrl(searchString)).openConnection();
@@ -95,11 +96,96 @@ public class CoordinateFinder {
 		}
 	}
 	
-	public Coordinate search(String searchString) {
-		JSONObject response = _search(searchString);
+	public Coordinate search(String location) {
+		return search(location, 0);
+	}
+	
+	private Coordinate search(String location, int pause) {
+		if (pause > 0)
+			pause(pause);
+		
+		JSONObject response = call(location);
 		if (response == null)
 			return null;
 		logger.debug(response);
+		
+		try {
+			JSONObject status = response.getJSONObject("Status");
+			int code = status.getInt("code");
+			switch (code) {
+				case 200:
+					/*
+					 * G_GEO_SUCCESS: No errors occurred; the address was successfully parsed 
+					 * and its geocode was returned. 
+					 */
+					if (pause > 1)
+						optimalPause = (pause + optimalPause) / 3;
+					break;
+					
+				case 500: 
+					/*
+					 * G_GEO_SERVER_ERROR: A geocoding or directions request could not be 
+					 * successfully processed, yet the exact reason for the failure is unknown.
+					 */
+					logger.error(location + ": G_GEO_SERVER_ERROR");
+					return null;
+					
+				case 601: 
+					/*
+					 * G_GEO_MISSING_QUERY: An empty address was specified in the HTTP q parameter.
+					 */
+					logger.error(location + ": G_GEO_MISSING_QUERY");
+					return null;
+				
+				case 602: 
+					/*
+					 * G_GEO_UNKNOWN_ADDRESS: No corresponding geographic location could be found 
+					 * for the specified address, possibly because the address is relatively new, 
+					 * or because it may be incorrect.
+					 */
+					logger.error(location + ": G_GEO_UNKNOWN_ADDRESS");
+					return null;
+					
+				case 603: 
+					/*
+					 * G_GEO_UNAVAILABLE_ADDRESS: The geocode for the given address or the route for 
+					 * the given directions query cannot be returned due to legal or contractual reasons.
+					 */
+					logger.error(location + ": G_GEO_UNAVAILABLE_ADDRESS");
+					return null;
+					
+				case 610: 
+					/*
+					 * G_GEO_BAD_KEY: The given key is either invalid or does not 
+					 * match the domain for which it was given.
+					 */
+					logger.error(location + ": G_GEO_BAD_KEY");
+					return null;
+					
+				case 620: 
+					/*
+					 * G_GEO_TOO_MANY_QUERIES: The given key has gone over the requests limit 
+					 * in the 24 hour period or has submitted too many requests in too short 
+					 * a period of time. If you're sending multiple requests in parallel or 
+					 * in a tight loop, use a timer or pause in your code to make sure you don't 
+					 * send the requests too quickly. 
+					 */
+					logger.info(location + ": G_GEO_TOO_MANY_QUERIES: " + pause);
+					if (pause <= 0)
+						pause = optimalPause;
+					else {
+						pause *= 2;
+					}
+					return search(location, pause);
+				
+				default: 
+					logger.error(location + ": unknown code: " + code);
+					return null;
+			}
+		} catch (JSONException e) {
+			logger.error(e + "\n" + location + "\n" + response);
+			return null;
+		}
 		
 		try {
 			JSONArray placemark = response.getJSONArray("Placemark");
@@ -111,11 +197,21 @@ public class CoordinateFinder {
 			logger.info(lat + ", " + lng);
 			return new Coordinate(lat, lng);
 		} catch (JSONException e) {
-			logger.error(e + "\n" + searchString + "\n" + response);
+			logger.error(e + "\n" + location + "\n" + response);
 			return null;
 		}	
 	}
 	
+	private void pause(int pause) {
+		synchronized (this) {
+			try {
+				this.wait(pause);
+			} catch (InterruptedException e) {
+				logger.error(e);
+			}	
+		}		
+	}
+
 	public static class Coordinate {
 		private float latitude;
 		private float longitude;
@@ -144,21 +240,4 @@ public class CoordinateFinder {
 		new CoordinateFinder().search("Southampton");
 //		new CoordinateFinder().search("Portland");
 	}
-
-	/*
-	 * {"responseData":{"viewport":{"center":{"lng":"-1.401712","lat":"50.938024"},
-	 * "ne":{"lng":"-1.3985645","lat":"50.94117"},
-	 * "sw":{"lng":"-1.4048594","lat":"50.934875"},
-	 * "span":{"lng":"0.006295","lat":"0.006295"}},
-	 * "cursor":{"moreResultsUrl":"http://www.google.com/local?oe=utf8&ie=utf8&num=4&mrt=yp%2Cloc&sll=37.779160%2C-122.420090&start=0&hl=en&q=SO16+7PD"},
-	 * "results":[{"region":"","streetAddress":"Southampton SO16 7PD","titleNoFormatting":"Southampton SO16 7PD",
-	 * "staticMapUrl":"http://mt.google.com/mapdata?cc=us&tstyp=5&Point=b&Point.latitude_e6=50938024&Point.longitude_e6=-1401712&Point.iconid=15&Point=e&w=150&h=100&zl=4",
-	 * "listingType":"local","addressLines":["Southampton SO16 7PD","UK"],"lng":"-1.401712",
-	 * "url":"http://www.google.com/maps?source=uds&q=SO16+7PD","country":"GB","city":"Southampton",
-	 * "GsearchResultClass":"GlocalSearch","maxAge":604800,"addressLookupResult":"/maps","title":"Southampton SO16 7PD",
-	 * "postalCode":"SO16","ddUrlToHere":"http://www.google.com/maps?source=uds&daddr=Southampton+SO16+7PD%2C+Southampton+%28Southampton+SO16+7PD%29+%4050.938024%2C-1.401712&iwstate1=dir%3Ato",
-	 * "ddUrl":"http://www.google.com/maps?source=uds&daddr=Southampton+SO16+7PD%2C+Southampton+%28Southampton+SO16+7PD%29+%4050.938024%2C-1.401712&saddr",
-	 * "ddUrlFromHere":"http://www.google.com/maps?source=uds&saddr=Southampton+SO16+7PD%2C+Southampton+%28Southampton+SO16+7PD%29+%4050.938024%2C-1.401712&iwstate1=dir%3Afrom",
-	 * "accuracy":"5","lat":"50.938024"}]},"responseDetails":null,"responseStatus":200}
-	 */
 }
