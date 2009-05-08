@@ -3,8 +3,7 @@ package org.silentsquare.dplus.bbctnews;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.silentsquare.dplus.google.CoordinateFinder;
-import org.silentsquare.dplus.google.CoordinateFinder.Coordinate;
+import org.silentsquare.dplus.bbctnews.CoordinateFinder.Coordinate;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
