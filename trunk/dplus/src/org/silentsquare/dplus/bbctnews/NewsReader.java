@@ -33,7 +33,7 @@ public class NewsReader {
 		this.feedUrlBundle = ResourceBundle.getBundle("feeds"); 
 	}
 	
-	public NewsReader read() {
+	public List<News> read() {
 		for (String key : feedUrlBundle.keySet()) {
 			logger.debug(key);
 			String url = feedUrlBundle.getString(key);
@@ -48,7 +48,7 @@ public class NewsReader {
 			}
 		}
 		
-		return this;
+		return this.newsList;
 	}
 	
 	private void parse(String url) throws MalformedURLException, IOException, SAXException {
@@ -56,10 +56,6 @@ public class NewsReader {
 		BufferedReader reader = new BufferedReader(new InputStreamReader(is));
 		this.xmlParser.parse(new InputSource(reader));
 		reader.close();
-	}
-
-	public int size() {
-		return newsList.size();
 	}
 	
 	/**
