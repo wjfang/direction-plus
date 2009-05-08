@@ -1,9 +1,16 @@
 package org.silentsquare.dplus.bbctnews;
 
+import java.io.Serializable;
+
 import org.apache.log4j.Logger;
 
-public class News {
+public class News implements Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1293108909386690486L;
+
 	private static final Logger logger = Logger.getLogger(News.class);
 	
 	public static final int VERY_SEVERE	= 6;
@@ -27,6 +34,11 @@ public class News {
 		
 	}
 
+	public News(float latitude, float longitude) {
+		this.latitude = latitude;
+		this.longitude = longitude;
+	}
+	
 	public News(String title, String description, String link) {
 		this.title = title;
 		this.description = description;
@@ -147,6 +159,40 @@ public class News {
 			+ "\t<title>" + this.title + "</title>\n"
 			+ "\t<description>" + this.description + "</description>\n"
 			+ "\t<link>" + this.link + "</link>\n"
+			+ "\t<location>" + this.location + "</location>\n"
+			+ "\t<degree>" + this.degree + "</degree>\n"
+			+ "\t<latitude>" + this.latitude + "</latitude>\n"
+			+ "\t<longitude>" + this.longitude + "</longitude>\n"
 			+ "</news>\n";			
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) return true;
+		if (!(obj instanceof News)) return false;
+		News n = (News) obj;
+		
+		return (title == null ? n.title == null : title.equals(n.title)) 
+			&& (description == null ? n.description == null : description.equals(n.description))
+			&& (link == null ? n.link == null : link.equals(n.link))
+			&& (location == null ? n.location == null : location.equals(n.location))
+			&& degree == n.degree
+			&& latitude == n.latitude
+			&& longitude == n.longitude;		
+	}
+	
+	private volatile int hashCode;
+	
+	@Override
+	public int hashCode() {
+		int result = hashCode;
+		if (result == 0) {
+			result = 17;
+			result = 31 * result + title.hashCode();
+			result = 31 * result + Float.floatToIntBits(latitude);
+			result = 31 * result + Float.floatToIntBits(longitude);
+			hashCode = result;
+		}
+		return result;
 	}
 }

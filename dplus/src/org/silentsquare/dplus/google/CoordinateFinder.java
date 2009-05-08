@@ -235,9 +235,13 @@ public class CoordinateFinder {
 	 * @param args
 	 */
 	public static void main(String[] args) throws Exception {
-//		new CoordinateFinder().search("SO16 7PD");
-//		new CoordinateFinder().search("A379 Teignmouth");
-		new CoordinateFinder().search("Southampton");
-//		new CoordinateFinder().search("Portland");
+		CoordinateFinder finder = new CoordinateFinder();
+		Coordinate c;
+//		c = finder.search("SO16 7PD");
+//		c = finder.search("A379 Teignmouth");
+//		c = finder.search("Southampton");
+		c = finder.search("Portsmouth");
+//		c = finder.search("Portland");
+		System.out.println(c.getLatitude() + ", " + c.longitude);
 	}
 }
