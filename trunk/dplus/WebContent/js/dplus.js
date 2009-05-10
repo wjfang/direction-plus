@@ -203,6 +203,35 @@ Info.prototype.updateUI = function() {
 }
 
 /*
+ * BBC Travel News Database Query Facility
+ */
+function TravelNewsDatabase() {
+	this.endpoint = "./travelNewsDBQuery";
+}
+
+TravelNewsDatabase.prototype.success = function(response) {
+	var newsarray = YAHOO.lang.JSON.parse(response.responseText);
+	alert(newsarray[2].title);
+}
+
+TravelNewsDatabase.prototype.failure = function(response) {
+	alert(response);
+}
+
+TravelNewsDatabase.prototype.query = function(route) {
+	var points = new Array();
+	for (var i = 0; i < route.getNumSteps(); i++) {
+		var s = route.getStep(i);
+		var p = s.getLatLng();
+		points[points.length] = [p.lat(), p.lng()];
+	}
+	var e = route.getEndLatLng();
+	points[points.length] = [e.lat(), e.lng()];
+	var request = YAHOO.lang.JSON.stringify(points); 
+	YAHOO.util.Connect.asyncRequest('POST', this.endpoint, this, request); 
+}
+
+/*
  * DPlus
  */
 function DPlus(config) {
@@ -253,6 +282,9 @@ function DPlus(config) {
     
     // info
     this.info = new Info(config.info);
+    
+    // travel news database
+    this.travelNewsDatabase = new TravelNewsDatabase();
     
     // main
     this.from = document.getElementById(config.fromId);
@@ -313,6 +345,8 @@ DPlus.prototype.analyseRoute = function() {
 	
 	this.info.updateUI();
 	this.info.reset();
+	
+	this.travelNewsDatabase.query(route);
 }
 
 // Google Maps 

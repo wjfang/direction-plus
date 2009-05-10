@@ -9,6 +9,8 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -64,6 +66,20 @@ public class TestNewsDatabaseTest {
 		for (News n : results) {
 			System.out.println(n);
 		}
+	}
+	
+	@Test
+	public void testJSON() {
+		News news = createTestNews();
+		JSONObject jo = new JSONObject(news);
+		System.out.println(jo);
+		
+		List<News> results = tdb.query(50.798912f, 50.904964f, -1.403234f, -1.0911627f);
+		JSONArray ja = new JSONArray();
+		for (News n : results) {
+			ja.put(new JSONObject(n));
+		}
+		System.out.println(ja);
 	}
 
 }
