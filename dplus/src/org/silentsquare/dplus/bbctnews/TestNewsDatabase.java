@@ -56,6 +56,7 @@ public class TestNewsDatabase extends AbstractNewsDatabase {
 	public TestNewsDatabase() {
 		ResourceBundle bundle = ResourceBundle.getBundle("dplus");
 		String dbPath = bundle.getString("test.newsDB");
+		logger.info(dbPath);
 		
 		File dbf = new File(dbPath);
 		if (dbf.exists()) {
