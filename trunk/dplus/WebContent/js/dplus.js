@@ -205,17 +205,50 @@ Info.prototype.updateUI = function() {
 /*
  * BBC Travel News Database Query Facility
  */
-function TravelNewsDatabase() {
+function TravelNewsDatabase(map) {
 	this.endpoint = "./travelNewsDBQuery";
+	this.map = map; // Google map
+	this.baseIcon = this.createBaseIcon();
+}
+
+TravelNewsDatabase.prototype.createBaseIcon = function() {
+	var icon = new GIcon();
+	icon.shadow = "http://www.google.com/mapfiles/shadow50.png";
+	icon.iconSize = new GSize(20, 34);
+	icon.shadowSize = new GSize(37, 34);
+	icon.iconAnchor = new GPoint(9, 34);
+	icon.infoWindowAnchor = new GPoint(9, 2);
+	icon.infoShadowAnchor = new GPoint(18, 25);
+	return icon;
 }
 
 TravelNewsDatabase.prototype.success = function(response) {
 	var newsarray = YAHOO.lang.JSON.parse(response.responseText);
-	alert(newsarray[2].title);
+	for (var i = 0; i < newsarray.length; i++) {
+		var news = newsarray[i];
+		this.createMarker(news);
+	}
+}
+
+TravelNewsDatabase.prototype.createMarker = function(news) {
+	var point = new GLatLng(news.latitude, news.longitude);
+
+	// Set up our GMarkerOptions object
+	var markerOptions = {};
+
+	var marker = new GMarker(point, markerOptions);
+
+	GEvent.addListener(marker, "click", function() {
+		marker.openInfoWindowHtml("<p><b>" + news.title + "</b></p>" +
+				"<p>" + news.description + "</p>" +
+				"<p><a href=\"" + news.link + "\" target=\"_blank\">More Information</a></p>",
+				{maxWidth: 360});
+	});
+	this.map.addOverlay(marker, news.title);
 }
 
 TravelNewsDatabase.prototype.failure = function(response) {
-	alert(response);
+	alert(response.responseText);
 }
 
 TravelNewsDatabase.prototype.query = function(route) {
@@ -239,6 +272,9 @@ function DPlus(config) {
 	var map = new GMap2(document.getElementById(config.mapId));
     map.setCenter(new GLatLng(53.0, -1.4), 6); // UK
     map.enableScrollWheelZoom();
+    map.addControl(new GLargeMapControl());
+	map.addControl(new GMapTypeControl());
+	
     var routeElement = document.getElementById(config.routeId);
     this.directions = new GDirections(map, routeElement);
     
@@ -284,7 +320,7 @@ function DPlus(config) {
     this.info = new Info(config.info);
     
     // travel news database
-    this.travelNewsDatabase = new TravelNewsDatabase();
+    this.travelNewsDatabase = new TravelNewsDatabase(map);
     
     // main
     this.from = document.getElementById(config.fromId);
