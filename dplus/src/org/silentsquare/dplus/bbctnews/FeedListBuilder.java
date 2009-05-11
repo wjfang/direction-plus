@@ -5,7 +5,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.MissingResourceException;
 import java.util.Properties;
@@ -121,7 +120,7 @@ public class FeedListBuilder {
 		if (f.exists())
 			f.delete();
 		try {
-			p.store(new FileOutputStream(f), Calendar.getInstance().toString());
+			p.store(new FileOutputStream(f), "BBC Travel News Feeds");
 		} catch (FileNotFoundException e) {
 			logger.error(e);
 			return;
