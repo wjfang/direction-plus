@@ -204,24 +204,70 @@ Info.prototype.updateUI = function() {
 
 /*
  * BBC Travel News Database Query Facility
+ * VERY_SEVERE	= 6;
+ * SEVERE		= 5;
+ * MEDIUM		= 4;
+ * SLIGHT 		= 3;
+ * LOW_IMPACT	= 2;
+ * CLEARED		= 1;
+ * UNKNOWN		= 0;
  */
-function TravelNewsDatabase(map) {
+function TravelNewsDatabase(map, config) {
 	this.endpoint = "./travelNewsDBQuery";
 	this.map = map; // Google map
-	this.baseIcon = this.createBaseIcon();
+	this.markerLists = [new Array(), new Array(), new Array(), new Array(), new Array(), new Array(), new Array()];
+	
+	this.verySevereIcon = this.createIcon("http://www.google.com/intl/en_us/mapfiles/ms/micons/red-dot.png");
+	this.severeIcon = this.createIcon("http://www.google.com/intl/en_us/mapfiles/ms/micons/pink-dot.png");
+	this.mediumIcon = this.createIcon("http://www.google.com/intl/en_us/mapfiles/ms/micons/orange-dot.png");
+	this.slightIcon = this.createIcon("http://www.google.com/intl/en_us/mapfiles/ms/micons/yellow-dot.png");
+	this.lowImpactIcon = this.createIcon("http://www.google.com/intl/en_us/mapfiles/ms/micons/blue-dot.png");
+	this.clearedIcon = this.createIcon("http://www.google.com/intl/en_us/mapfiles/ms/micons/purple-dot.png");
+	this.unknownIcon = this.createIcon("http://www.google.com/intl/en_us/mapfiles/ms/micons/green-dot.png");
+	
+	// By default, all degrees of news are displayed.
+	this.degreeStatus = new Array(7);
+	this.degreeStatus[0] = this.checkStatus(config.unknownId);
+	this.degreeStatus[1] = this.checkStatus(config.clearedId);
+	this.degreeStatus[2] = this.checkStatus(config.lowImpactId);
+	this.degreeStatus[3] = this.checkStatus(config.slightId);
+	this.degreeStatus[4] = this.checkStatus(config.mediumId);
+	this.degreeStatus[5] = this.checkStatus(config.severeId);
+	this.degreeStatus[6] = this.checkStatus(config.verySevereId);
 }
 
-TravelNewsDatabase.prototype.createBaseIcon = function() {
-	var icon = new GIcon();
-	icon.shadow = "http://www.google.com/mapfiles/shadow50.png";
-	icon.iconSize = new GSize(20, 34);
-	icon.shadowSize = new GSize(37, 34);
-	icon.iconAnchor = new GPoint(9, 34);
-	icon.infoWindowAnchor = new GPoint(9, 2);
-	icon.infoShadowAnchor = new GPoint(18, 25);
+TravelNewsDatabase.prototype.checkStatus = function(id) {
+	var el = document.getElementById(id);
+	if (el.checked == true)
+		return 1;
+	else
+		return 0;
+}
+
+TravelNewsDatabase.prototype.switchDegree = function(degree) {
+	var ml = this.markerLists[degree];
+	for (var i = 0; i < ml.length; i++) {
+		if (this.degreeStatus[degree] == 1) {
+			ml[i].hide();
+		} else {
+			ml[i].show();
+		}
+	}
+	
+	if (this.degreeStatus[degree] == 1) {
+		this.degreeStatus[degree] = 0;
+	} else {
+		this.degreeStatus[degree] = 1;
+	}
+}
+
+TravelNewsDatabase.prototype.createIcon = function(imageURL) {
+	var icon = new GIcon(G_DEFAULT_ICON);
+	icon.image = imageURL;
+	icon.iconSize = new GSize(32, 32);
 	return icon;
 }
-
+ 
 TravelNewsDatabase.prototype.success = function(response) {
 	var newsarray = YAHOO.lang.JSON.parse(response.responseText);
 	for (var i = 0; i < newsarray.length; i++) {
@@ -234,7 +280,7 @@ TravelNewsDatabase.prototype.createMarker = function(news) {
 	var point = new GLatLng(news.latitude, news.longitude);
 
 	// Set up our GMarkerOptions object
-	var markerOptions = {};
+	var markerOptions = {icon: this.getIcon(news.degree)};
 
 	var marker = new GMarker(point, markerOptions);
 
@@ -245,6 +291,36 @@ TravelNewsDatabase.prototype.createMarker = function(news) {
 				{maxWidth: 360});
 	});
 	this.map.addOverlay(marker, news.title);
+	
+	this.markerLists[news.degree].push(marker);
+	
+	if (this.degreeStatus[news.degree] == 0)
+		marker.hide();
+}
+
+TravelNewsDatabase.prototype.getIcon = function(degree) {
+	switch (degree) {
+		case 6:
+			return this.verySevereIcon;
+		
+		case 5:
+			return this.severeIcon;
+			
+		case 4:
+			return this.mediumIcon;
+			
+		case 3:
+			return this.slightIcon;
+			
+		case 2:
+			return this.lowImpactIcon;
+			
+		case 1:
+			return this.clearedIcon;
+			
+		default:
+			return this.unknownIcon;
+	}
 }
 
 TravelNewsDatabase.prototype.failure = function(response) {
@@ -320,7 +396,7 @@ function DPlus(config) {
     this.info = new Info(config.info);
     
     // travel news database
-    this.travelNewsDatabase = new TravelNewsDatabase(map);
+    this.travelNewsDatabase = new TravelNewsDatabase(map, config.travelNews);
     
     // main
     this.from = document.getElementById(config.fromId);
