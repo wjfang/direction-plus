@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -62,7 +63,8 @@ public class TestNewsDatabaseTest {
 		 * Southampton: 50.904964, -1.403234
 		 * Portsmouth: 50.798912, -1.0911627
 		 */
-		List<News> results = tdb.query(50.798912f, 50.904964f, -1.403234f, -1.0911627f);
+		List<News> results = tdb.query(Arrays.asList(
+				new float[] {50.904964f, -1.403234f}, new float[] {50.798912f, -1.0911627f}));
 		for (News n : results) {
 			System.out.println(n);
 		}
@@ -74,7 +76,8 @@ public class TestNewsDatabaseTest {
 		JSONObject jo = new JSONObject(news);
 		System.out.println(jo);
 		
-		List<News> results = tdb.query(50.798912f, 50.904964f, -1.403234f, -1.0911627f);
+		List<News> results = tdb.query(Arrays.asList(
+				new float[] {50.904964f, -1.403234f}, new float[] {50.798912f, -1.0911627f}));
 		JSONArray ja = new JSONArray();
 		for (News n : results) {
 			ja.put(new JSONObject(n));
