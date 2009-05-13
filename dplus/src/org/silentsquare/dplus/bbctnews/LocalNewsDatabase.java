@@ -14,7 +14,7 @@ public class LocalNewsDatabase extends AbstractNewsDatabase {
 	private static final Logger logger = Logger.getLogger(LocalNewsDatabase.class);
 
 	@Override
-	public List<News> query(float bottom, float top, float left, float right) {
+	public List<News> query(List<float[]> waypoints) {
 		// TODO Auto-generated method stub
 		return null;
 	}

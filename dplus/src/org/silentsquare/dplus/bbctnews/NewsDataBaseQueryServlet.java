@@ -43,7 +43,7 @@ public class NewsDataBaseQueryServlet extends HttpServlet {
 		String rs = request.getReader().readLine();
 		logger.debug(rs);
 		
-		List<float[]> pointlist = new ArrayList<float[]>();
+		List<float[]> waypoints = new ArrayList<float[]>();
 		try {
 			JSONArray pa = new JSONArray(rs);
 			for (int i = 0; i < pa.length(); i++) {
@@ -51,32 +51,14 @@ public class NewsDataBaseQueryServlet extends HttpServlet {
 				JSONArray po = pa.getJSONArray(i);
 				point[0] = (float) po.getDouble(0);
 				point[1] = (float) po.getDouble(1);
-				pointlist.add(point);
+				waypoints.add(point);
 			}
 		} catch (JSONException e) {
 			logger.error(e);
 			throw new ServletException(e);
 		}		
 		
-		float[] start = pointlist.get(0);
-		float[] end = pointlist.get(pointlist.size() - 1);
-		float bottom, top, left, right;
-		if (start[0] < end[0]) {
-			bottom = start[0];
-			top = end[0];
-		} else {
-			bottom = end[0];
-			top = start[0];
-		}
-		if (start[1] < end[1]) {
-			left = start[1];
-			right = end[1];
-		} else {
-			left = end[1];
-			right = start[1];
-		}
-		
-		List<News> results = newsDatabase.query(bottom, top, left, right);
+		List<News> results = newsDatabase.query(waypoints);
 		JSONArray ja = new JSONArray();
 		for (News news : results) {
 			ja.put(new JSONObject(news));
