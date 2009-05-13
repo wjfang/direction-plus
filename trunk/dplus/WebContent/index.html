@@ -63,7 +63,17 @@ function initialise() {
 			singleTripId:		"dplus-info-single",
 			tripNumId:			"dplus-info-tripnum",
 			tripSetId:			"dplus-info-tripset"
-		}
+		},
+		travelNews: {
+			verySevereId:	"travelNews-verySevere",
+			severeId:		"travelNews-severe",
+			mediumId:		"travelNews-medium",
+			slightId:		"travelNews-slight",
+			lowImpactId:	"travelNews-lowImpact",
+			clearedId:		"travelNews-cleared",
+			unknownId:		"travelNews-unknown"
+			
+		}	
 		});
 }
 
@@ -148,12 +158,51 @@ function finalise() {
 				<tr><td class="dplus-info-prompt">Fuel Cost:</td><td id="dplus-info-cost">0</td><td>Pounds</td></tr>
 			</table>
 			<br>
-			<p>How many times will you travel along the route?</p>
+			<p><b>How many times will you travel along the route?</b></p>
 			<input type="radio" id="dplus-info-single" name="dplus-info-trip" value="single" onclick="dplus.info.onSingleTrip()"> Single <br>
 			<input type="radio" name="dplus-info-trip" value="return" onclick="dplus.info.onReturnTrip()"> Return <br> 
 			<input type="radio" name="dplus-info-trip" value="custom" onclick="dplus.info.onCustomTrip()"> 
 			<input id="dplus-info-tripnum" type="text" size="4">
 			<input id="dplus-info-tripset" type="button" value="Set" onclick="dplus.info.onTripNum()"><br>
+			<br>
+			<p><b>Choose travel news to display:</b></p>
+			<table>
+				<tr>
+					<td><img src="http://www.google.com/intl/en_us/mapfiles/ms/micons/red-dot.png"></td>
+					<td>Very Severe&nbsp;</td>
+					<td><input type="checkbox" checked="checked" id="travelNews-verySevere" onclick="dplus.travelNewsDatabase.switchDegree(6)"></td>
+				</tr>
+				<tr>
+					<td><img src="http://www.google.com/intl/en_us/mapfiles/ms/micons/pink-dot.png"></td>
+					<td>Severe</td>
+					<td><input type="checkbox" checked="checked" id="travelNews-severe" onclick="dplus.travelNewsDatabase.switchDegree(5)"></td>
+				</tr>
+				<tr>
+					<td><img src="http://www.google.com/intl/en_us/mapfiles/ms/micons/orange-dot.png"></td>
+					<td>Medium</td>
+					<td><input type="checkbox" checked="checked" id="travelNews-medium" onclick="dplus.travelNewsDatabase.switchDegree(4)"></td>
+				</tr>
+				<tr>
+					<td><img src="http://www.google.com/intl/en_us/mapfiles/ms/micons/yellow-dot.png"></td>
+					<td>Slight</td>
+					<td><input type="checkbox" checked="checked" id="travelNews-slight" onclick="dplus.travelNewsDatabase.switchDegree(3)"></td>
+				</tr>
+				<tr>
+					<td><img src="http://www.google.com/intl/en_us/mapfiles/ms/micons/blue-dot.png"></td>
+					<td>Low Impact</td>
+					<td><input type="checkbox" checked="checked" id="travelNews-lowImpact" onclick="dplus.travelNewsDatabase.switchDegree(2)"></td>
+				</tr>
+				<tr>
+					<td><img src="http://www.google.com/intl/en_us/mapfiles/ms/micons/purple-dot.png"></td>
+					<td>Cleared</td>
+					<td><input type="checkbox" checked="checked" id="travelNews-cleared" onclick="dplus.travelNewsDatabase.switchDegree(1)"></td>
+				</tr>
+				<tr>
+					<td><img src="http://www.google.com/intl/en_us/mapfiles/ms/micons/green-dot.png"></td>
+					<td>Other</td>
+					<td><input type="checkbox" checked="checked" id="travelNews-unknown" onclick="dplus.travelNewsDatabase.switchDegree(0)"></td>
+				</tr>
+			</table>
 			</div>
 		</div>
 	</div>
