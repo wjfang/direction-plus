@@ -4,46 +4,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import org.apache.log4j.Logger;
 
 public abstract class AbstractNewsDatabase implements NewsDatabase {
 	
 	private static final Logger logger = Logger.getLogger(AbstractNewsDatabase.class); 
-
-	public static final long DATABASE_UPDATE_PERIOD = 3600 * 1000; // one hour in ms 
-		
-	private NewsReader newsReader;
-	
-	public NewsReader getNewsReader() {
-		return newsReader;
-	}
-	
-	public void setNewsReader(NewsReader newsReader) {
-		this.newsReader = newsReader;
-	}
-	
-	private Timer timer = new Timer("Updating Travel News Database");
-	
-	protected AbstractNewsDatabase() {		
-		timer.scheduleAtFixedRate(new TimerTask() {
-			@Override
-			public void run() {
-				updateDatabase();				
-			}}, 
-			0, DATABASE_UPDATE_PERIOD);
-	}
 	
 	@Override
 	public abstract List<News> query(List<float[]> waypoints);
-	
-	protected final List<News> readNews() {
-		return newsReader.read();
-	}
-	
-	protected abstract void updateDatabase();
 	
 	protected Comparator<News> latitudeComparator = new Comparator<News>() {
 		@Override
@@ -92,9 +61,9 @@ public abstract class AbstractNewsDatabase implements NewsDatabase {
 	 * @return
 	 */
 	protected List<News> lookUpInList(List<float[]> waypoints, List<News> newslist) {
-		if (waypoints == null || waypoints.size() < 2 || newslist == null || newslist.size() == 0) {
+		if (waypoints == null || waypoints.size() < 2 || newslist == null) {
 			throw new IllegalArgumentException(
-					"waypoints must have at least two elements and newslist cannot be empty.");
+					"waypoints must have at least two elements and newslist cannot be null.");
 		}
 		
 		float bottom = 90;
