@@ -20,7 +20,7 @@ import org.silentsquare.dplus.bbctnews.TestNewsDatabase;
 
 public class TestNewsDatabaseTest {
 	
-	private TestNewsDatabase tdb = new TestNewsDatabase();
+	private TestNewsDatabase tdb = new TestNewsDatabase("Z:/workshop/workspace/dplus/news.db");
 	
 	private long start;
 	
