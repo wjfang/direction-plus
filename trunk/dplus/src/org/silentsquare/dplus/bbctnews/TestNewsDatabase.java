@@ -7,12 +7,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
-import java.util.ResourceBundle;
 
 import org.apache.log4j.Logger;
 
@@ -31,9 +27,7 @@ public class TestNewsDatabase extends AbstractNewsDatabase {
 	 */
 	private List<News> newsList;
 	
-	public TestNewsDatabase() {
-		ResourceBundle bundle = ResourceBundle.getBundle("dplus");
-		String dbPath = bundle.getString("test.newsDB");
+	public TestNewsDatabase(String dbPath) {
 		logger.info(dbPath);
 		
 		File dbf = new File(dbPath);
@@ -86,20 +80,5 @@ public class TestNewsDatabase extends AbstractNewsDatabase {
 	protected void updateDatabase() {
 		// Do nothing.
 	}
-
-	/**
-	 * @param args
-	 * @throws Exception 
-	 */
-	public static void main(String[] args) throws Exception {
-		long start = System.currentTimeMillis();
-		TestNewsDatabase tdb = new TestNewsDatabase(); 
-		System.out.println(tdb.size());
-		List<News> results = tdb.query(Arrays.asList(
-				new float[] {50.904964f, -1.403234f}, new float[] {50.798912f, -1.0911627f}));
-		for (News n : results) {
-			System.out.println(n);
-		}
-		System.out.println((System.currentTimeMillis() - start) + "ms");
-	}
+	
 }
