@@ -236,6 +236,16 @@ function TravelNewsDatabase(map, config) {
 	this.degreeStatus[6] = this.checkStatus(config.verySevereId);
 }
 
+TravelNewsDatabase.prototype.clearAllMarkers = function() {
+	for (var i = 0; i < this.markerLists.length; i++) {
+		var ml = this.markerLists[i];
+		for (var j = 0; j < ml.length; j++) {
+			ml[j].hide();
+		}
+	}
+	this.markerLists = [new Array(), new Array(), new Array(), new Array(), new Array(), new Array(), new Array()];
+}
+
 TravelNewsDatabase.prototype.checkStatus = function(id) {
 	var el = document.getElementById(id);
 	if (el.checked == true)
@@ -467,6 +477,9 @@ DPlus.prototype.navigate = function() {
 		alert("Neither the source address nor the destination address can be empty!");
 		return;
 	}
+	
+	// Clear current news markers
+	this.travelNewsDatabase.clearAllMarkers();
 	
 	// first use localSearch to locate the (latitude, longitude) of from and to,
 	// then find the route between them.
