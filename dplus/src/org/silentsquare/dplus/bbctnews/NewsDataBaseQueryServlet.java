@@ -13,6 +13,9 @@ import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.silentsquare.dplus.Configuration;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * Servlet implementation class NewsDataBaseQueryServlet
@@ -23,8 +26,8 @@ public class NewsDataBaseQueryServlet extends HttpServlet {
 	private static final Logger logger = Logger.getLogger(NewsDataBaseQueryServlet.class);
 	
 	private NewsDatabase newsDatabase;
-       
-    /**
+	
+	/**
      * @see HttpServlet#HttpServlet()
      */
     public NewsDataBaseQueryServlet() {
@@ -33,7 +36,9 @@ public class NewsDataBaseQueryServlet extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
-    	newsDatabase = new TestNewsDatabase();
+    	WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(this.getServletContext());
+    	Configuration cfg = (Configuration) ctx.getBean("configuration");
+    	newsDatabase = cfg.getNewsDatabase();
     }
     
 	/**

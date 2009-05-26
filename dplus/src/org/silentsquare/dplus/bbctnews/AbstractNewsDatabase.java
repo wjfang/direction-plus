@@ -8,7 +8,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import org.apache.log4j.Logger;
-import org.xml.sax.SAXException;
 
 public abstract class AbstractNewsDatabase implements NewsDatabase {
 	
@@ -18,18 +17,17 @@ public abstract class AbstractNewsDatabase implements NewsDatabase {
 		
 	private NewsReader newsReader;
 	
+	public NewsReader getNewsReader() {
+		return newsReader;
+	}
+	
+	public void setNewsReader(NewsReader newsReader) {
+		this.newsReader = newsReader;
+	}
+	
 	private Timer timer = new Timer("Updating Travel News Database");
 	
-	protected AbstractNewsDatabase() {
-		try {
-			this.newsReader = new NewsReader();
-		} catch (SAXException e) {
-			/*
-			 * Should not happen.
-			 */
-			logger.fatal(e);
-		}
-		
+	protected AbstractNewsDatabase() {		
 		timer.scheduleAtFixedRate(new TimerTask() {
 			@Override
 			public void run() {
