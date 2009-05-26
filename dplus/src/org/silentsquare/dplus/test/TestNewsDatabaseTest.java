@@ -15,17 +15,24 @@ import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.silentsquare.dplus.bbctnews.FeedListBuilder;
 import org.silentsquare.dplus.bbctnews.News;
+import org.silentsquare.dplus.bbctnews.NewsReader;
 import org.silentsquare.dplus.bbctnews.TestNewsDatabase;
 
 public class TestNewsDatabaseTest {
 	
-	private TestNewsDatabase tdb = new TestNewsDatabase("Z:/workshop/workspace/dplus/news.db");
+	private TestNewsDatabase tdb;
 	
 	private long start;
 	
 	@Before
 	public void setUp() throws Exception {
+		FeedListBuilder builder = new FeedListBuilder();
+		builder.setUrl("http://www.bbc.co.uk/travelnews/tpeg/rss.opml");
+		NewsReader newsReader = new NewsReader();
+		newsReader.setFeedListBuilder(builder);
+		tdb = new TestNewsDatabase("Z:/workshop/workspace/dplus/news.db", newsReader);
 		start = System.currentTimeMillis();
 	}
 

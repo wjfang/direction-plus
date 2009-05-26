@@ -27,7 +27,7 @@ public class TestNewsDatabase extends AbstractNewsDatabase {
 	 */
 	private List<News> newsList;
 	
-	public TestNewsDatabase(String dbPath) {
+	public TestNewsDatabase(String dbPath, NewsReader newsReader) {
 		logger.info(dbPath);
 		
 		File dbf = new File(dbPath);
@@ -50,7 +50,7 @@ public class TestNewsDatabase extends AbstractNewsDatabase {
 			/*
 			 * Create one
 			 */
-			newsList = readNews();
+			newsList = newsReader.read();
 			/*
 			 * Sort by latitude
 			 */
@@ -74,11 +74,6 @@ public class TestNewsDatabase extends AbstractNewsDatabase {
 	@Override
 	public List<News> query(List<float[]> waypoints) {
 		return lookUpInList(waypoints, newsList);
-	}
-
-	@Override
-	protected void updateDatabase() {
-		// Do nothing.
 	}
 	
 }
