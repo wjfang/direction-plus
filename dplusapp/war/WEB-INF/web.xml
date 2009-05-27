@@ -17,7 +17,7 @@
 		<servlet-name>NewsDatabaseQueryServlet</servlet-name>
 		<url-pattern>/queryNewsDB</url-pattern>
 	</servlet-mapping>
-	
+ 	
 	<servlet>
 		<description></description>
 		<display-name>NewsDatabaseUpdateServlet</display-name>
@@ -29,7 +29,7 @@
 		<servlet-name>NewsDatabaseUpdateServlet</servlet-name>
 		<url-pattern>/updateNewsDB</url-pattern>
 	</servlet-mapping>
-	
+
 	<welcome-file-list>
 		<welcome-file>index.html</welcome-file>
 	</welcome-file-list>

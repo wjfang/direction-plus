@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <cronentries>
   <cron>
-    <url>/updateNewsDB</url>
+    <url>/updateNewsDB?key=hellopiggy</url>
     <description>Update travel news database</description>
     <schedule>every 60 minutes</schedule>
   </cron>
