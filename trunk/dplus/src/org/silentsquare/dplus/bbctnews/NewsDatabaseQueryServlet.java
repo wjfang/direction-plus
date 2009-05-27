@@ -70,5 +70,4 @@ public class NewsDatabaseQueryServlet extends HttpServlet {
 		}
 		response.getWriter().println(ja);
 	}
-
 }
