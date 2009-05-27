@@ -14,4 +14,13 @@ public class Configuration {
 		this.newsDatabase = newsDatabase;
 	}
 
+	private String updateKey;
+	
+	public String getUpdateKey() {
+		return updateKey;
+	}
+	
+	public void setUpdateKey(String updateKey) {
+		this.updateKey = updateKey;
+	}
 }

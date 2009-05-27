@@ -24,7 +24,7 @@ public class TestNewsDatabase extends AbstractNewsDatabase {
 	 */
 	private List<News> newsList;
 	
-	public TestNewsDatabase(String dbPath, NewsReader newsReader) {
+	public TestNewsDatabase(String dbPath) {
 		logger.info(dbPath);
 		
 		File dbf = new File(dbPath);
@@ -45,23 +45,6 @@ public class TestNewsDatabase extends AbstractNewsDatabase {
 			}			
 		} else {
 			logger.error(dbPath + " does not exist.");
-//			/*
-//			 * Create one
-//			 */
-//			newsList = newsReader.read();
-//			/*
-//			 * Sort by latitude
-//			 */
-//			Collections.sort(newsList, latitudeComparator);
-//			try {
-//				ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(dbf));
-//				oos.writeObject(newsList);
-//				oos.close();
-//			} catch (FileNotFoundException e) {
-//				logger.error(e);
-//			} catch (IOException e) {
-//				logger.error(e);
-//			}			
 		}
 	}
 
@@ -72,6 +55,11 @@ public class TestNewsDatabase extends AbstractNewsDatabase {
 	@Override
 	public List<News> query(List<float[]> waypoints) {
 		return lookUpInList(waypoints, newsList);
+	}
+	
+	@Override
+	public void update() {
+		// Do nothing		
 	}
 	
 }
