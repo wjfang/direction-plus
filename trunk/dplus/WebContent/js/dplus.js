@@ -213,7 +213,7 @@ Info.prototype.updateUI = function() {
  * UNKNOWN		= 0;
  */
 function TravelNewsDatabase(map, config) {
-	this.endpoint = "./travelNewsDBQuery";
+	this.endpoint = "./queryNewsDB";
 	this.map = map; // Google map
 	this.markerLists = [new Array(), new Array(), new Array(), new Array(), new Array(), new Array(), new Array()];
 	
