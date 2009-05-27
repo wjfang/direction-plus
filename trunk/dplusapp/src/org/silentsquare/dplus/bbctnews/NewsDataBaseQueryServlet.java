@@ -20,17 +20,17 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 /**
  * Servlet implementation class NewsDataBaseQueryServlet
  */
-public class NewsDataBaseQueryServlet extends HttpServlet {
+public class NewsDatabaseQueryServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	
-	private static final Logger logger = Logger.getLogger(NewsDataBaseQueryServlet.class);
+	private static final Logger logger = Logger.getLogger(NewsDatabaseQueryServlet.class);
 	
 	private NewsDatabase newsDatabase;
 	
 	/**
      * @see HttpServlet#HttpServlet()
      */
-    public NewsDataBaseQueryServlet() {
+    public NewsDatabaseQueryServlet() {
         super();
     }
 
