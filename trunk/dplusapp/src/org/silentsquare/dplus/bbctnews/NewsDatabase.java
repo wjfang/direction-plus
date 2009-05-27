@@ -11,4 +11,9 @@ public interface NewsDatabase {
 	 */
 	public List<News> query(List<float[]> waypoints);
 	
+	/**
+	 * Update news database.
+	 */
+	public void update();
+	
 }

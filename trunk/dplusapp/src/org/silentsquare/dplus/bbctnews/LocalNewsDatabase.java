@@ -16,9 +16,16 @@ public class LocalNewsDatabase extends AbstractNewsDatabase {
 
 	private NewsReader newsReader;
 	
-	public LocalNewsDatabase(long updatePeriod, NewsReader newsReader) {
+	public NewsReader getNewsReader() {
+		return newsReader;
+	}
+	
+	public void setNewsReader(NewsReader newsReader) {
 		this.newsReader = newsReader;
-		updateDatabase();
+	}
+	
+	public LocalNewsDatabase() {
+		
 	}
 	
 	private volatile List<News> newsList = Collections.EMPTY_LIST;
@@ -29,11 +36,19 @@ public class LocalNewsDatabase extends AbstractNewsDatabase {
 		return lookUpInList(waypoints, nl);
 	}
 
-	private void updateDatabase() {
+	private volatile boolean updating;
+	
+	@Override
+	public void update() {
+		if (updating)
+			return;
+		
+		updating = true;
 		logger.info("Start updating news database ...");
 		List<News> nl = newsReader.read();
 		logger.info("Finish updating news database: " + nl.size() + "news retrieved.");
 		newsList = nl;
+		updating = false;
 	}
 
 }
