@@ -8,13 +8,13 @@
 
 	<servlet>
 		<description></description>
-		<display-name>NewsDataBaseQueryServlet</display-name>
-		<servlet-name>NewsDataBaseQueryServlet</servlet-name>
-		<servlet-class>org.silentsquare.dplus.bbctnews.NewsDataBaseQueryServlet</servlet-class>
+		<display-name>NewsDatabaseQueryServlet</display-name>
+		<servlet-name>NewsDatabaseQueryServlet</servlet-name>
+		<servlet-class>org.silentsquare.dplus.bbctnews.NewsDatabaseQueryServlet</servlet-class>
 	</servlet>
 	
 	<servlet-mapping>
-		<servlet-name>NewsDataBaseQueryServlet</servlet-name>
+		<servlet-name>NewsDatabaseQueryServlet</servlet-name>
 		<url-pattern>/queryNewsDB</url-pattern>
 	</servlet-mapping>
 	
