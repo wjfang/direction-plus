@@ -69,6 +69,5 @@ public class NewsDatabaseQueryServlet extends HttpServlet {
 			ja.put(new JSONObject(news));
 		}
 		response.getWriter().println(ja);
-	}
-	
+	}	
 }
