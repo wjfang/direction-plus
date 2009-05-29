@@ -21,23 +21,24 @@
     	<property name="feedListBuilder" ref="feedListBuilder"/>
     </bean>
     
-    <!-- Test news databse which is file based and does not update -->
+    <!-- Test news databse which is file based and does not update 
 	<bean id="testNewsDatabase" class="org.silentsquare.dplus.bbctnews.TestNewsDatabase">
-		<constructor-arg value="C:/Documents and Settings/wjfang/My Documents/workspace/dplus/news.db"/>
-		<!-- <constructor-arg value="Z:/workshop/workspace/dplus/news.db"/> -->
+		<constructor-arg value="Z:/workshop/workspace/dplus/news.db"/>
 		<constructor-arg ref="newsReader"/>
     </bean>
+    -->
+    <!-- <constructor-arg value="C:/Documents and Settings/wjfang/My Documents/workspace/dplus/news.db"/> -->
     
-    <!-- Local news database that updates -->
+    <!-- Local news database that updates in seconds --> 
 	<bean id="localNewsDatabase" class="org.silentsquare.dplus.bbctnews.LocalNewsDatabase">
-    	<constructor-arg value="3600"/> <!-- in seconds -->
+    	<constructor-arg value="3600"/>
     	<constructor-arg ref="newsReader"/>
     </bean>
 
 	<!-- The global configuration for D+ -->
     <bean id="configuration" class="org.silentsquare.dplus.Configuration">
-    	<property name="newsDatabase" ref="testNewsDatabase"/>
-    	<!-- <property name="newsDatabase" ref="localNewsDatabase"/> -->
+    	<property name="newsDatabase" ref="localNewsDatabase"/>
+    	<!-- <property name="newsDatabase" ref="testNewsDatabase"/> -->
     </bean>
         
 </beans>

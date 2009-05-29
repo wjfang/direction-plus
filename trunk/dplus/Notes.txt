@@ -46,6 +46,9 @@ This is also the Google AJAX Search API key.
 ABQIAAAAj1DqbVODIwfxFozz52vGCBTjVrl75TqAeOSnYEtAQbFma9R-CBTFTT2D1Wv3b7hEWenNomPzZPPdgg
 http://users.ecs.soton.ac.uk/wf/dplus/
 
+ABQIAAAAj1DqbVODIwfxFozz52vGCBSrO3kQvRHuFsdXn7Vd8_vrp2TDthS8qjapcwgyrPbIkPYy48XzDod65g
+http://fang.omii.ac.uk:8080/dplus/
+
 ================================================
 Issues
 ================================================
