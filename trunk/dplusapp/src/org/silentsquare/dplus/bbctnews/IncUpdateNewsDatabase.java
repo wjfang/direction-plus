@@ -60,7 +60,7 @@ public class IncUpdateNewsDatabase extends LocalNewsDatabase {
 				newsReader.reset();
 				state = State.START;
 				index = 0;
-				logger.info("Incremental update finished");
+				logger.info("Incremental update finished: " + this.newsList.size() + " news retrieved");
 				break;
 		}
 	}
