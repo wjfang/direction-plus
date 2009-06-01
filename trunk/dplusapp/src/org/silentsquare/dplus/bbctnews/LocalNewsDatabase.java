@@ -2,8 +2,7 @@ package org.silentsquare.dplus.bbctnews;
 
 import java.util.Collections;
 import java.util.List;
-
-import org.apache.log4j.Logger;
+import java.util.logging.Logger;
 
 /**
  * In memory, persistent database.
@@ -12,7 +11,7 @@ import org.apache.log4j.Logger;
  */
 public class LocalNewsDatabase extends AbstractNewsDatabase {
 	
-	private static final Logger logger = Logger.getLogger(LocalNewsDatabase.class);
+	private static final Logger logger = Logger.getLogger(LocalNewsDatabase.class.getName());
 
 	protected NewsReader newsReader;
 	

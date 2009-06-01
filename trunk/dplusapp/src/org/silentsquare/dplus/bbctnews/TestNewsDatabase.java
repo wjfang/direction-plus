@@ -6,8 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.List;
-
-import org.apache.log4j.Logger;
+import java.util.logging.Logger;
 
 /**
  * Read + Serialization = 464328ms
@@ -17,7 +16,7 @@ import org.apache.log4j.Logger;
  */
 public class TestNewsDatabase extends AbstractNewsDatabase {
 	
-	private static final Logger logger = Logger.getLogger(TestNewsDatabase.class);
+	private static final Logger logger = Logger.getLogger(TestNewsDatabase.class.getName());
 	
 	/**
 	 * Sorted by latitude.
@@ -37,14 +36,14 @@ public class TestNewsDatabase extends AbstractNewsDatabase {
 				newsList = (List<News>) ois.readObject();
 				ois.close();
 			} catch (FileNotFoundException e) {
-				logger.error(e);
+				logger.severe(e.getMessage());
 			} catch (IOException e) {
-				logger.error(e);
+				logger.severe(e.getMessage());
 			} catch (ClassNotFoundException e) {
-				logger.error(e);
+				logger.severe(e.getMessage());
 			}			
 		} else {
-			logger.error(dbPath + " does not exist.");
+			logger.severe(dbPath + " does not exist.");
 		}
 	}
 

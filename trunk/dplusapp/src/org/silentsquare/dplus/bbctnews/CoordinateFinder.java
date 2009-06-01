@@ -11,20 +11,30 @@ import java.net.ProtocolException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.util.logging.Logger;
 
-import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public class CoordinateFinder {
 	
-	private static final Logger logger = Logger.getLogger(CoordinateFinder.class);
+	private static final Logger logger = Logger.getLogger(CoordinateFinder.class.getName());
 	
 	public static final String ENDPOINT_URL_PREFIX = 
 		"http://maps.google.com/maps/geo?output=json&oe=utf8&sensor=false&q=";
 	
 	private int optimalPause = 16; // in milliseconds
+	
+	private String apiKey;
+	
+	public String getApiKey() {
+		return apiKey;
+	}
+	
+	public void setApiKey(String apiKey) {
+		this.apiKey = apiKey;
+	}
 	
 	public CoordinateFinder() {
 		
@@ -38,7 +48,7 @@ public class CoordinateFinder {
 			 * should not happen.
 			 */
 		}
-		return ENDPOINT_URL_PREFIX + searchString;
+		return ENDPOINT_URL_PREFIX + searchString + "&key=" + apiKey;
 	}
 	
 	private JSONObject call(String searchString) {
@@ -46,10 +56,10 @@ public class CoordinateFinder {
 		try {
 			uc = new URL(generateUrl(searchString)).openConnection();
 		} catch (MalformedURLException e) {
-			logger.error(e);
+			logger.severe(e.getMessage());
 			return null;
 		} catch (IOException e) {
-			logger.error(e);
+			logger.severe(e.getMessage());
 			return null;
 		}
         HttpURLConnection connection = (HttpURLConnection) uc;
@@ -57,13 +67,13 @@ public class CoordinateFinder {
         try {
 			connection.setRequestMethod("GET");
 		} catch (ProtocolException e) {
-			logger.error(e);
+			logger.severe(e.getMessage());
 			return null;
 		}
         try {
 			connection.connect();
 		} catch (IOException e) {
-			logger.error(e);
+			logger.severe(e.getMessage());
 			return null;
 		}
         
@@ -82,7 +92,7 @@ public class CoordinateFinder {
 			    buffer.append(line);
 			}
 		} catch (IOException e) {
-			logger.error(e);
+			logger.severe(e.getMessage());
 			return null;
 		}        
         
@@ -91,7 +101,7 @@ public class CoordinateFinder {
         try {
 			return new JSONObject(buffer.substring(start, end));
 		} catch (JSONException e) {
-			logger.error(e + "\n" + buffer);
+			logger.severe(e + "\n" + buffer);
 			return null;
 		}
 	}
@@ -107,7 +117,7 @@ public class CoordinateFinder {
 		JSONObject response = call(location);
 		if (response == null)
 			return null;
-		logger.debug(response);
+		logger.fine(response.toString());
 		
 		try {
 			JSONObject status = response.getJSONObject("Status");
@@ -127,14 +137,14 @@ public class CoordinateFinder {
 					 * G_GEO_SERVER_ERROR: A geocoding or directions request could not be 
 					 * successfully processed, yet the exact reason for the failure is unknown.
 					 */
-					logger.error(location + ": G_GEO_SERVER_ERROR");
+					logger.warning(location + ": G_GEO_SERVER_ERROR");
 					return null;
 					
 				case 601: 
 					/*
 					 * G_GEO_MISSING_QUERY: An empty address was specified in the HTTP q parameter.
 					 */
-					logger.error(location + ": G_GEO_MISSING_QUERY");
+					logger.warning(location + ": G_GEO_MISSING_QUERY");
 					return null;
 				
 				case 602: 
@@ -143,7 +153,7 @@ public class CoordinateFinder {
 					 * for the specified address, possibly because the address is relatively new, 
 					 * or because it may be incorrect.
 					 */
-					logger.error(location + ": G_GEO_UNKNOWN_ADDRESS");
+					logger.warning(location + ": G_GEO_UNKNOWN_ADDRESS");
 					return null;
 					
 				case 603: 
@@ -151,7 +161,7 @@ public class CoordinateFinder {
 					 * G_GEO_UNAVAILABLE_ADDRESS: The geocode for the given address or the route for 
 					 * the given directions query cannot be returned due to legal or contractual reasons.
 					 */
-					logger.error(location + ": G_GEO_UNAVAILABLE_ADDRESS");
+					logger.warning(location + ": G_GEO_UNAVAILABLE_ADDRESS");
 					return null;
 					
 				case 610: 
@@ -159,7 +169,7 @@ public class CoordinateFinder {
 					 * G_GEO_BAD_KEY: The given key is either invalid or does not 
 					 * match the domain for which it was given.
 					 */
-					logger.error(location + ": G_GEO_BAD_KEY");
+					logger.warning(location + ": G_GEO_BAD_KEY");
 					return null;
 					
 				case 620: 
@@ -170,7 +180,7 @@ public class CoordinateFinder {
 					 * in a tight loop, use a timer or pause in your code to make sure you don't 
 					 * send the requests too quickly. 
 					 */
-					logger.info(location + ": G_GEO_TOO_MANY_QUERIES: " + pause);
+					logger.warning(location + ": G_GEO_TOO_MANY_QUERIES: " + pause);
 					if (pause <= 0)
 						pause = optimalPause;
 					else {
@@ -179,11 +189,11 @@ public class CoordinateFinder {
 					return search(location, pause);
 				
 				default: 
-					logger.error(location + ": unknown code: " + code);
+					logger.warning(location + ": unknown code: " + code);
 					return null;
 			}
 		} catch (JSONException e) {
-			logger.error(e + "\n" + location + "\n" + response);
+			logger.severe(e + "\n" + location + "\n" + response);
 			return null;
 		}
 		
@@ -194,10 +204,10 @@ public class CoordinateFinder {
 			JSONArray coordinates = point.getJSONArray("coordinates");
 			float lat = (float) coordinates.getDouble(1);
 			float lng = (float) coordinates.getDouble(0);;
-			logger.info(lat + ", " + lng);
+			logger.fine(lat + ", " + lng);
 			return new Coordinate(lat, lng);
 		} catch (JSONException e) {
-			logger.error(e + "\n" + location + "\n" + response);
+			logger.severe(e + "\n" + location + "\n" + response);
 			return null;
 		}	
 	}
@@ -207,7 +217,7 @@ public class CoordinateFinder {
 			try {
 				this.wait(pause);
 			} catch (InterruptedException e) {
-				logger.error(e);
+				logger.severe(e.getMessage());
 			}	
 		}		
 	}

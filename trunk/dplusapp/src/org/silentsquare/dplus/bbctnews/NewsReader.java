@@ -1,15 +1,13 @@
 package org.silentsquare.dplus.bbctnews;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
-import org.apache.log4j.Logger;
 import org.silentsquare.dplus.bbctnews.CoordinateFinder.Coordinate;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -18,12 +16,18 @@ import org.xml.sax.helpers.XMLReaderFactory;
 
 public class NewsReader {
 	
-	private static final Logger logger = Logger.getLogger(NewsReader.class); 
+	private static final Logger logger = Logger.getLogger(NewsReader.class.getName()); 
 	
 	private List<News> newsList = new ArrayList<News>();
 	
 	public List<News> getNewsList() {
 		return newsList;
+	}
+	
+	private List<String> feedList;
+	
+	public List<String> getFeedList() {
+		return feedList;
 	}
 	
 	private XMLReader xmlParser;
@@ -55,7 +59,9 @@ public class NewsReader {
 	
 	public List<News> read() {
 		this.newsList.clear();
-		for (String url : this.feedListBuilder.build()) {
+		
+		buildFeedList();
+		for (String url : this.feedList) {
 			parse(url);
 		}
 		
@@ -63,7 +69,7 @@ public class NewsReader {
 			updateCoordinate(news);
 		}
 		
-		return this.newsList;
+		return copyNewsList();
 	}
 	
 	public void updateCoordinate(News news) {
@@ -83,7 +89,7 @@ public class NewsReader {
 			this.xmlParser.parse(new InputSource(reader));
 			reader.close();
 		} catch (Exception e) {
-			logger.error(e);
+			logger.severe(e.getMessage());
 		}
 	}
 
@@ -91,8 +97,11 @@ public class NewsReader {
 		this.newsList.clear();		
 	}
 
-	public List<String> buildFeedList() {
-		return feedListBuilder.build();
+	public void buildFeedList() {
+		this.feedList = this.feedListBuilder.build();
 	}
 
+	public List<News> copyNewsList() {
+		return new ArrayList<News>(this.newsList);		
+	}
 }
