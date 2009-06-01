@@ -4,12 +4,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-
-import org.apache.log4j.Logger;
+import java.util.logging.Logger;
 
 public abstract class AbstractNewsDatabase implements NewsDatabase {
 	
-	private static final Logger logger = Logger.getLogger(AbstractNewsDatabase.class); 
+	private static final Logger logger = Logger.getLogger(AbstractNewsDatabase.class.getName()); 
 	
 	@Override
 	public abstract List<News> query(List<float[]> waypoints);

@@ -1,8 +1,7 @@
 package org.silentsquare.dplus.bbctnews;
 
 import java.io.Serializable;
-
-import org.apache.log4j.Logger;
+import java.util.logging.Logger;
 
 public class News implements Serializable {
 	
@@ -11,7 +10,7 @@ public class News implements Serializable {
 	 */
 	private static final long serialVersionUID = 1293108909386690486L;
 
-	private static final Logger logger = Logger.getLogger(News.class);
+	private static final Logger logger = Logger.getLogger(News.class.getName());
 	
 	public static final int VERY_SEVERE	= 6;
 	public static final int SEVERE		= 5;
@@ -146,11 +145,11 @@ public class News implements Serializable {
 				break;
 			
 			default:
-				logger.error(s);
+				logger.severe(s);
 		}
 		
 		location = title.substring(j + 1, k).trim();
-		logger.debug("degree = " + degree + ", location = " + location + ", title = " + title);
+		logger.fine("degree = " + degree + ", location = " + location + ", title = " + title);
 	}
 
 	@Override

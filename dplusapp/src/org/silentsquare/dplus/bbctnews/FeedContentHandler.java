@@ -1,15 +1,15 @@
 package org.silentsquare.dplus.bbctnews;
 
 import java.util.List;
+import java.util.logging.Logger;
 
-import org.apache.log4j.Logger;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 class FeedContentHandler extends DefaultHandler {
 	
-	private static final Logger logger = Logger.getLogger(FeedContentHandler.class); 
+	private static final Logger logger = Logger.getLogger(FeedContentHandler.class.getName()); 
 	
 	private List<News> newsList;
 	
@@ -45,7 +45,7 @@ class FeedContentHandler extends DefaultHandler {
 		if ("item".equals(localName)) {
 			this.newsList.add(currentNews);
 			currentNews.parseTitle();
-			logger.debug(currentNews);
+			logger.fine(currentNews.toString());
 			currentNews = null;
 		} else if (currentNews != null) {
 			if ("title".equals(localName)) {

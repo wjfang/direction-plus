@@ -3,13 +3,13 @@ package org.silentsquare.dplus.bbctnews;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -23,7 +23,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 public class NewsDatabaseQueryServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	
-	private static final Logger logger = Logger.getLogger(NewsDatabaseQueryServlet.class);
+	private static final Logger logger = Logger.getLogger(NewsDatabaseQueryServlet.class.getName());
 	
 	private NewsDatabase newsDatabase;
 	
@@ -46,7 +46,7 @@ public class NewsDatabaseQueryServlet extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {		 
 		String rs = request.getReader().readLine();
-		logger.debug(rs);
+		logger.fine(rs);
 		
 		List<float[]> waypoints = new ArrayList<float[]>();
 		try {
@@ -59,7 +59,7 @@ public class NewsDatabaseQueryServlet extends HttpServlet {
 				waypoints.add(point);
 			}
 		} catch (JSONException e) {
-			logger.error(e);
+			logger.severe(e.getMessage());
 			throw new ServletException(e);
 		}		
 		

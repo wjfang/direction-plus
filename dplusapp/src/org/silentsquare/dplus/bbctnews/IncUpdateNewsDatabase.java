@@ -1,12 +1,11 @@
 package org.silentsquare.dplus.bbctnews;
 
 import java.util.List;
-
-import org.apache.log4j.Logger;
+import java.util.logging.Logger;
 
 public class IncUpdateNewsDatabase extends LocalNewsDatabase {
 	
-	private static final Logger logger = Logger.getLogger(IncUpdateNewsDatabase.class);
+	private static final Logger logger = Logger.getLogger(IncUpdateNewsDatabase.class.getName());
 	
 	private static final int FEEDS_PER_UPDATE = 10;
 	
@@ -21,27 +20,26 @@ public class IncUpdateNewsDatabase extends LocalNewsDatabase {
 	 */
 	private int index;  
 	
-	private List<String> feedList;
-	
 	@Override
 	synchronized public void update() {
 		switch (state) {
 			case START :
-				feedList = newsReader.buildFeedList();
+				newsReader.buildFeedList();
 				state = State.READING_FEEDS;
 				index = 0;
 				logger.info("Retrieved the feed list");
 				break;
 			
 			case READING_FEEDS :
-				for (int i = 0; i < FEEDS_PER_UPDATE && index < feedList.size(); i++) {
-					newsReader.parse(feedList.get(index++));
+				List<String> fl = newsReader.getFeedList();
+				for (int i = 0; i < FEEDS_PER_UPDATE && index < fl.size(); i++) {
+					newsReader.parse(fl.get(index++));
 				}
-				if (index == feedList.size()) {
+				logger.info("Retrieved Feed No." + (index - 1));
+				if (index == fl.size()) {
 					state = State.FINDING_COORDINATE;
 					index = 0;
 				}
-				logger.info("Retrieved Feed No.  " + (index - 1));
 				break;
 				
 			case FINDING_COORDINATE :
@@ -50,15 +48,15 @@ public class IncUpdateNewsDatabase extends LocalNewsDatabase {
 					News news = nl.get(index++);
 					newsReader.updateCoordinate(news);
 				}
+				logger.info("Found coordinate of News No." + (index - 1));
 				if (index == nl.size()) {
 					state = State.FINISH;
 					index = 0;
 				}
-				logger.info("Found coordinate of News No.  " + (index - 1));
 				break;
 				
 			case FINISH :
-				this.newsList = newsReader.getNewsList();
+				this.newsList = newsReader.copyNewsList();
 				newsReader.reset();
 				state = State.START;
 				index = 0;
