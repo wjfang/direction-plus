@@ -52,7 +52,7 @@ public class NewsReader {
 			}
 		}
 		
-		return this.newsList;
+		return new ArrayList<News>(this.newsList);
 	}
 	
 	private void parse(String url) throws MalformedURLException, IOException, SAXException {
