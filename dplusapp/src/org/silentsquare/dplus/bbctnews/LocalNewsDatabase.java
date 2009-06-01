@@ -14,7 +14,7 @@ public class LocalNewsDatabase extends AbstractNewsDatabase {
 	
 	private static final Logger logger = Logger.getLogger(LocalNewsDatabase.class);
 
-	private NewsReader newsReader;
+	protected NewsReader newsReader;
 	
 	public NewsReader getNewsReader() {
 		return newsReader;
@@ -28,7 +28,7 @@ public class LocalNewsDatabase extends AbstractNewsDatabase {
 		
 	}
 	
-	private volatile List<News> newsList = Collections.EMPTY_LIST;
+	protected volatile List<News> newsList = Collections.EMPTY_LIST;
 	
 	@Override
 	public List<News> query(List<float[]> waypoints) {
@@ -46,7 +46,7 @@ public class LocalNewsDatabase extends AbstractNewsDatabase {
 		updating = true;
 		logger.info("Start updating news database ...");
 		List<News> nl = newsReader.read();
-		logger.info("Finish updating news database: " + nl.size() + "news retrieved.");
+		logger.info("Finish updating news database: " + nl.size() + " news retrieved.");
 		newsList = nl;
 		updating = false;
 	}

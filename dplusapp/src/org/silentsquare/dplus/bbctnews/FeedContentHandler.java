@@ -3,7 +3,6 @@ package org.silentsquare.dplus.bbctnews;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.silentsquare.dplus.bbctnews.CoordinateFinder.Coordinate;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -17,8 +16,6 @@ class FeedContentHandler extends DefaultHandler {
 	private News currentNews;
 	
 	private StringBuffer textBuffer;
-	
-	private CoordinateFinder coordinateFinder = new CoordinateFinder();
 	
 	FeedContentHandler(List<News> newsList) {
 		this.newsList = newsList;
@@ -48,13 +45,6 @@ class FeedContentHandler extends DefaultHandler {
 		if ("item".equals(localName)) {
 			this.newsList.add(currentNews);
 			currentNews.parseTitle();
-			if (currentNews.getLocation() != null) {
-				Coordinate co = coordinateFinder.search(currentNews.getLocation());
-				if (co != null) {
-					currentNews.setLatitude(co.getLatitude());
-					currentNews.setLongitude(co.getLongitude());
-				}
-			}
 			logger.debug(currentNews);
 			currentNews = null;
 		} else if (currentNews != null) {

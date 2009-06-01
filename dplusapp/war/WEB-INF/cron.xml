@@ -3,6 +3,6 @@
   <cron>
     <url>/updateNewsDB?key=hellopiggy</url>
     <description>Update travel news database</description>
-    <schedule>every 60 minutes</schedule>
+    <schedule>every 1 minutes</schedule>
   </cron>
 </cronentries>
