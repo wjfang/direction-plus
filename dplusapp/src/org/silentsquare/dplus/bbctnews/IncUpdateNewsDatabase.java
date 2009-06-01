@@ -7,9 +7,9 @@ public class IncUpdateNewsDatabase extends LocalNewsDatabase {
 	
 	private static final Logger logger = Logger.getLogger(IncUpdateNewsDatabase.class.getName());
 	
-	private static final int FEEDS_PER_UPDATE = 10;
+	private static final int FEEDS_PER_UPDATE = 20;
 	
-	private static final int NEWS_PER_UPDATE = 50;
+	private static final int NEWS_PER_UPDATE = 100;
 
 	private enum State {START, READING_FEEDS, FINDING_COORDINATE, FINISH};
 	
