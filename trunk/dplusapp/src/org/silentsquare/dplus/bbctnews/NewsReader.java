@@ -58,7 +58,7 @@ public class NewsReader {
 	}
 	
 	public List<News> read() {
-		this.newsList.clear();
+		reset();
 		
 		buildFeedList();
 		for (String url : this.feedList) {
