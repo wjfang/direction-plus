@@ -39,6 +39,7 @@ public class NewsReader {
 	}
 	
 	public List<News> read() {
+		this.newsList.clear();
 		for (String url : this.feedListBuilder.build()) {
 			try {
 				parse(url);

@@ -28,13 +28,15 @@ public class FeedListBuilder {
 		this.url = url;
 	}
 	
-	private List<String> list = new ArrayList<String>();
+	private List<String> list;
 	
 	public FeedListBuilder() {
 		
 	}
 	
 	public List<String> build() {
+		this.list = new ArrayList<String>();
+		
 		DocumentBuilder builder = null;
 		try {
 			builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
