@@ -2,12 +2,6 @@ package org.silentsquare.dplus.bbctnews;
 
 import java.io.Serializable;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-
-@Entity
 public class News implements Serializable {
 	
 	/**
@@ -15,10 +9,6 @@ public class News implements Serializable {
 	 */
 	private static final long serialVersionUID = 1293108909386690486L;
 
-	@Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-	
 	public static final int VERY_SEVERE	= 6;
 	public static final int SEVERE		= 5;
 	public static final int MEDIUM		= 4;
@@ -51,14 +41,6 @@ public class News implements Serializable {
 		this.link = link;
 	}
 
-	public Long getId() {
-		return id;
-	}
-	
-	public void setId(Long id) {
-		this.id = id;
-	}
-	
 	public final String getTitle() {
 		return title;
 	}
