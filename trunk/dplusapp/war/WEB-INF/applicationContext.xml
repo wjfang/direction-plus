@@ -17,7 +17,8 @@
     </bean>
     
     <!-- Coordinate finder -->
-	<bean id="coordinateFinder" class="org.silentsquare.dplus.bbctnews.CoordinateFinder">
+	<bean id="coordinateFinder" class="org.silentsquare.dplus.bbctnews.CoordinateFinder">			
+		<property name="geoURL" value="http://maps.google.com/maps/geo?output=json&amp;oe=utf8&amp;sensor=false"/>
 		<property name="apiKey" value="ABQIAAAAj1DqbVODIwfxFozz52vGCBTBKtqaU_qKk-cwvy6tFS36W-EYRhTQIx4Jc7ffCTqfgjkPZSJocVxSCA"/>
     </bean>
     
@@ -41,6 +42,8 @@
     <!-- Incremental update news database -->
 	<bean id="incUpdateNewsDatabase" class="org.silentsquare.dplus.bbctnews.IncUpdateNewsDatabase">
     	<property name="newsReader" ref="newsReader"/>
+    	<property name="expectedWallTime" value="15"/> <!-- in seconds -->
+    	<property name="persistenceUnit" value="transactions-optional"/> <!-- see persistence.xml -->
     </bean>
 
 	<!-- The global configuration for D+ -->

@@ -21,8 +21,15 @@ public class CoordinateFinder {
 	
 	private static final Logger logger = Logger.getLogger(CoordinateFinder.class.getName());
 	
-	public static final String ENDPOINT_URL_PREFIX = 
-		"http://maps.google.com/maps/geo?output=json&oe=utf8&sensor=false&q=";
+	private String geoURL;
+	
+	public String getGeoURL() {
+		return geoURL;
+	}
+	
+	public void setGeoURL(String geoURL) {
+		this.geoURL = geoURL;
+	}
 	
 	private int optimalPause = 16; // in milliseconds
 	
@@ -48,7 +55,7 @@ public class CoordinateFinder {
 			 * should not happen.
 			 */
 		}
-		return ENDPOINT_URL_PREFIX + searchString + "&key=" + apiKey;
+		return this.geoURL + "&key=" + apiKey + "&q=" + searchString;
 	}
 	
 	private JSONObject call(String searchString) {
@@ -110,6 +117,12 @@ public class CoordinateFinder {
 		return search(location, 0);
 	}
 	
+	/**
+	 * 
+	 * @param location
+	 * @param pause pause milliseconds before call.
+	 * @return
+	 */
 	private Coordinate search(String location, int pause) {
 		if (pause > 0)
 			pause(pause);
@@ -239,19 +252,5 @@ public class CoordinateFinder {
 			return longitude;
 		}
 	}
-	
-	/**
-	 * 
-	 * @param args
-	 */
-	public static void main(String[] args) throws Exception {
-		CoordinateFinder finder = new CoordinateFinder();
-		Coordinate c;
-//		c = finder.search("SO16 7PD");
-//		c = finder.search("A379 Teignmouth");
-//		c = finder.search("Southampton");
-		c = finder.search("Portsmouth");
-//		c = finder.search("Portland");
-		System.out.println(c.getLatitude() + ", " + c.longitude);
-	}
+
 }

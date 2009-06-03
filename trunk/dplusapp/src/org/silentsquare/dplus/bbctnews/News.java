@@ -1,8 +1,13 @@
 package org.silentsquare.dplus.bbctnews;
 
 import java.io.Serializable;
-import java.util.logging.Logger;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
+@Entity
 public class News implements Serializable {
 	
 	/**
@@ -10,7 +15,9 @@ public class News implements Serializable {
 	 */
 	private static final long serialVersionUID = 1293108909386690486L;
 
-	private static final Logger logger = Logger.getLogger(News.class.getName());
+	@Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 	
 	public static final int VERY_SEVERE	= 6;
 	public static final int SEVERE		= 5;
@@ -44,6 +51,14 @@ public class News implements Serializable {
 		this.link = link;
 	}
 
+	public Long getId() {
+		return id;
+	}
+	
+	public void setId(Long id) {
+		this.id = id;
+	}
+	
 	public final String getTitle() {
 		return title;
 	}
@@ -145,11 +160,10 @@ public class News implements Serializable {
 				break;
 			
 			default:
-				logger.severe(s);
+				// TODO
 		}
 		
 		location = title.substring(j + 1, k).trim();
-		logger.fine("degree = " + degree + ", location = " + location + ", title = " + title);
 	}
 
 	@Override
