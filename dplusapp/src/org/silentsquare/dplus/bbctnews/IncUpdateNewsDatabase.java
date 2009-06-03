@@ -3,9 +3,9 @@ package org.silentsquare.dplus.bbctnews;
 import java.util.List;
 import java.util.logging.Logger;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
+import javax.jdo.JDOHelper;
+import javax.jdo.PersistenceManager;
+import javax.jdo.PersistenceManagerFactory;
 
 public class IncUpdateNewsDatabase extends LocalNewsDatabase {
 	
@@ -30,19 +30,22 @@ public class IncUpdateNewsDatabase extends LocalNewsDatabase {
 		this.expectedWallTime = expectedWallTime;
 	}
 	
-	private String persistenceUnit;
+	private String persistenceManagerFactoryName;
 	
-	public String getPersistenceUnit() {
-		return persistenceUnit;
+	public String getPersistenceManagerFactoryName() {
+		return persistenceManagerFactoryName;
 	}
 	
-	public void setPersistenceUnit(String persistenceUnit) {
-		this.persistenceUnit = persistenceUnit;
+	public void setPersistenceManagerFactoryName(
+			String persistenceManagerFactoryName) {
+		this.persistenceManagerFactoryName = persistenceManagerFactoryName;
 	}
 	
 	private long beginUpdate;	
 	private long beginDoUpdate;
 	private long endDoUpdate;
+	
+	private PersistenceManager persistenceManager;
 	
 	@Override
 	synchronized public void update() {
@@ -67,13 +70,13 @@ public class IncUpdateNewsDatabase extends LocalNewsDatabase {
 			return false;
 	}
 
-	private EntityManager entityManager;
-	
 	private void doUpdate() {
 		switch (state) {
 			case RESTORE:
-				EntityManagerFactory emf = Persistence.createEntityManagerFactory(persistenceUnit);
-				entityManager = emf.createEntityManager();
+				PersistenceManagerFactory pmf =
+					JDOHelper.getPersistenceManagerFactory(this.persistenceManagerFactoryName);
+				persistenceManager = pmf.getPersistenceManager();
+
 				// TODO restore news from data store if exists
 				state = State.BUILD_FEED_LIST;
 				logger.info("Restored news from data store");

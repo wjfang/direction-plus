@@ -43,7 +43,7 @@
 	<bean id="incUpdateNewsDatabase" class="org.silentsquare.dplus.bbctnews.IncUpdateNewsDatabase">
     	<property name="newsReader" ref="newsReader"/>
     	<property name="expectedWallTime" value="15"/> <!-- in seconds -->
-    	<property name="persistenceUnit" value="transactions-optional"/> <!-- see persistence.xml -->
+    	<property name="persistenceManagerFactoryName" value="transactions-optional"/> <!-- see META-INF/jdoconfig.xml -->
     </bean>
 
 	<!-- The global configuration for D+ -->
