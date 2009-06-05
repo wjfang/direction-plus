@@ -42,6 +42,10 @@ public class LocalNewsDatabase extends AbstractNewsDatabase {
 	private void updateDatabase() {
 		logger.info("Start updating news database ...");
 		List<News> nl = newsReader.read();
+		/*
+		 * Sort by latitude
+		 */
+		Collections.sort(nl, this.latitudeComparator);
 		logger.info("Finish updating news database: " + nl.size() + "news retrieved.");
 		newsList = nl;
 	}
