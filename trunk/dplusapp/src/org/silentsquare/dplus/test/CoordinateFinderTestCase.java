@@ -6,7 +6,7 @@ import org.junit.Test;
 import org.silentsquare.dplus.bbctnews.CoordinateFinder;
 import org.silentsquare.dplus.bbctnews.CoordinateFinder.Coordinate;
 
-public class CoordinateFinderTest {
+public class CoordinateFinderTestCase {
 
 	private CoordinateFinder finder;
 	
