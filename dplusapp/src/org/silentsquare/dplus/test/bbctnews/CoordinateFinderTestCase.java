@@ -1,4 +1,4 @@
-package org.silentsquare.dplus.test;
+package org.silentsquare.dplus.test.bbctnews;
 
 import org.junit.After;
 import org.junit.Before;
