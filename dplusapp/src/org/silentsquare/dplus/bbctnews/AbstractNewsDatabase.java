@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 public abstract class AbstractNewsDatabase implements NewsDatabase {
@@ -12,6 +13,11 @@ public abstract class AbstractNewsDatabase implements NewsDatabase {
 	
 	@Override
 	public abstract List<News> query(List<float[]> waypoints);
+	
+	@Override
+	public Map<String, String> monitor() {
+		return Collections.EMPTY_MAP;
+	}
 	
 	protected Comparator<News> latitudeComparator = new Comparator<News>() {
 		@Override

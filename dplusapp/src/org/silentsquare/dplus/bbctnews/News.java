@@ -2,11 +2,15 @@ package org.silentsquare.dplus.bbctnews;
 
 import java.io.Serializable;
 
+import javax.jdo.annotations.IdGeneratorStrategy;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
+
+@PersistenceCapable(identityType = IdentityType.APPLICATION)
 public class News implements Serializable {
 	
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1293108909386690486L;
 
 	public static final int VERY_SEVERE	= 6;
@@ -17,10 +21,41 @@ public class News implements Serializable {
 	public static final int CLEARED		= 1;
 	public static final int UNKNOWN		= 0;
 	
+	@PrimaryKey
+	@Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
+	private Long id;
+	
+	/*
+	 * url of the feed
+	 */
+	private String url;
+	
+	/*
+	 * title, description and link directly come from the feed.
+	 */
 	private String title;
 	private String description;
 	private String link;
 	
+	/*
+	 * True if this news is obsolete. 
+	 * obsolete is set to false when a news is created.
+	 */
+	private boolean obsolete;
+	
+	/*
+	 * System.currentTimeMillis() when this news is created.
+	 */
+	private long createTime;
+	
+	/*
+	 * System.currentTimeMillis() when this news is updated.
+	 */
+	private long updateTime; 
+	
+	/*
+	 * location, degree, latitude, and longitude are calculated from title.
+	 */
 	private String location;
 	private int degree;
 	private float latitude		= -90; // South Pole: no travel news will happen in South Pole. 
@@ -30,17 +65,36 @@ public class News implements Serializable {
 		
 	}
 
-	public News(float latitude, float longitude) {
+	News(float latitude, float longitude) {
 		this.latitude = latitude;
 		this.longitude = longitude;
 	}
 	
-	public News(String title, String description, String link) {
+	public News(String url, String title, String description, String link) {
+		this.url = url;
 		this.title = title;
 		this.description = description;
 		this.link = link;
+		this.createTime = System.currentTimeMillis();
+		this.updateTime = this.createTime;
 	}
 
+	public Long getId() {
+		return id;
+	}
+	
+	public void setId(Long id) {
+		this.id = id;
+	}
+	
+	public String getUrl() {
+		return url;
+	}
+	
+	public void setUrl(String url) {
+		this.url = url;
+	}
+	
 	public final String getTitle() {
 		return title;
 	}
@@ -63,6 +117,30 @@ public class News implements Serializable {
 
 	public final void setLink(String link) {
 		this.link = link;
+	}
+	
+	public boolean isObsolete() {
+		return obsolete;
+	}
+	
+	public void setObsolete(boolean obsolete) {
+		this.obsolete = obsolete;
+	}
+	
+	public long getCreateTime() {
+		return createTime;
+	}
+	
+	public void setCreateTime(long createTime) {
+		this.createTime = createTime;
+	}
+	
+	public long getUpdateTime() {
+		return updateTime;
+	}
+	
+	public void setUpdateTime(long updateTime) {
+		this.updateTime = updateTime;
 	}
 	
 	public final String getLocation() {
@@ -151,6 +229,7 @@ public class News implements Serializable {
 	@Override
 	public String toString() {
 		return "\n<news>\n" 
+			+ "\t<url>" + this.url + "</url>\n"
 			+ "\t<title>" + this.title + "</title>\n"
 			+ "\t<description>" + this.description + "</description>\n"
 			+ "\t<link>" + this.link + "</link>\n"
@@ -158,6 +237,9 @@ public class News implements Serializable {
 			+ "\t<degree>" + this.degree + "</degree>\n"
 			+ "\t<latitude>" + this.latitude + "</latitude>\n"
 			+ "\t<longitude>" + this.longitude + "</longitude>\n"
+			+ "\t<obsolete>" + this.obsolete + "</obsolete>\n"
+			+ "\t<createTime>" + this.createTime + "</createTime>\n"
+			+ "\t<updateTime>" + this.updateTime + "</updateTime>\n"			
 			+ "</news>\n";			
 	}
 	
@@ -167,13 +249,10 @@ public class News implements Serializable {
 		if (!(obj instanceof News)) return false;
 		News n = (News) obj;
 		
-		return (title == null ? n.title == null : title.equals(n.title)) 
+		return (url == null ? n.url == null : url.equals(n.url)) 
+			&& (title == null ? n.title == null : title.equals(n.title)) 
 			&& (description == null ? n.description == null : description.equals(n.description))
-			&& (link == null ? n.link == null : link.equals(n.link))
-			&& (location == null ? n.location == null : location.equals(n.location))
-			&& degree == n.degree
-			&& latitude == n.latitude
-			&& longitude == n.longitude;		
+			&& (link == null ? n.link == null : link.equals(n.link));		
 	}
 	
 	private volatile int hashCode;
@@ -183,9 +262,10 @@ public class News implements Serializable {
 		int result = hashCode;
 		if (result == 0) {
 			result = 17;
+			result = 31 * result + url.hashCode();
 			result = 31 * result + title.hashCode();
-			result = 31 * result + Float.floatToIntBits(latitude);
-			result = 31 * result + Float.floatToIntBits(longitude);
+			result = 31 * result + description.hashCode();
+			result = 31 * result + link.hashCode();
 			hashCode = result;
 		}
 		return result;

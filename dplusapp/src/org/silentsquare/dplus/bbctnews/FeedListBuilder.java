@@ -2,6 +2,7 @@ package org.silentsquare.dplus.bbctnews;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -28,38 +29,35 @@ public class FeedListBuilder {
 		this.url = url;
 	}
 	
-	private List<String> list;
+	private DocumentBuilder builder;
 	
 	public FeedListBuilder() {
-		
-	}
-	
-	public List<String> build() {
-		this.list = new ArrayList<String>();
-		
-		DocumentBuilder builder = null;
 		try {
 			builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 		} catch (ParserConfigurationException e) {
 			logger.severe(e.getMessage());
-			return list;
+			throw new RuntimeException(e);
 		}
-		
+	}
+	
+	public List<String> build() {
 		Document doc = null;
 		try {
 			doc = builder.parse(url);
 		} catch (SAXException e) {
 			logger.severe(e.getMessage());
-			return list;
+			return Collections.EMPTY_LIST;
 		} catch (IOException e) {
 			logger.severe(e.getMessage());
-			return list;
+			return Collections.EMPTY_LIST;
 		}
 		
 		return buildFeedList(doc);
 	}
 
 	private List<String> buildFeedList(Document doc) {
+		List<String> list = new ArrayList<String>();
+		
 		NodeList nl = doc.getDocumentElement().getElementsByTagName("body");
 		Element body = (Element) nl.item(0);
 		if (body == null) {
