@@ -16,6 +16,10 @@
     	<property name="url" value="http://www.bbc.co.uk/travelnews/tpeg/rss.opml"/>
     </bean>
     
+    <!-- Feed Reader -->
+	<bean id="feedReader" class="org.silentsquare.dplus.bbctnews.FeedReader">
+    </bean>
+    
     <!-- Coordinate finder -->
 	<bean id="coordinateFinder" class="org.silentsquare.dplus.bbctnews.CoordinateFinder">			
 		<property name="geoURL" value="http://maps.google.com/maps/geo?output=json&amp;oe=utf8&amp;sensor=false"/>
@@ -42,7 +46,7 @@
     <!-- Incremental update news database -->
 	<bean id="incUpdateNewsDatabase" class="org.silentsquare.dplus.bbctnews.IncUpdateNewsDatabase">
     	<property name="newsReader" ref="newsReader"/>
-    	<property name="expectedWallTime" value="15"/> <!-- in seconds -->
+    	<property name="expectedWallTime" value="20"/> <!-- in seconds -->
     	<property name="persistenceManagerFactoryName" value="transactions-optional"/> <!-- see META-INF/jdoconfig.xml -->
     </bean>
 
