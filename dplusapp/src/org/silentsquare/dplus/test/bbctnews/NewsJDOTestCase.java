@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import java.util.List;
 
 import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 
 import org.junit.After;
 import org.junit.Before;
@@ -53,6 +54,44 @@ public class NewsJDOTestCase extends GAETestCase {
 		try {
 			News news = persistenceManager.getObjectById(News.class, id);
 			System.out.println(news);
+		} finally {
+			persistenceManager.close();
+		}
+	}
+	
+	@Test
+	public void testFindCurrent() throws Exception {
+		String url = "http://www.bbc.co.uk/travelnews/tpeg/en/local/rtm/bedfordshire_rss.xml";
+		
+		FeedReader feedReader = new FeedReader();
+		List<News> list = feedReader.read(url);
+		
+		persistenceManager = persistenceManagerFactory.getPersistenceManager();
+		try {
+			list = (List) persistenceManager.makePersistentAll(list);
+		} finally {
+			persistenceManager.close();
+		}
+		
+		persistenceManager = persistenceManagerFactory.getPersistenceManager();
+		try {
+			Query query = persistenceManager.newQuery(News.class);
+			query.setFilter("url == urlParam");
+			query.setFilter("obsolete == false");
+//			query.setFilter("createTime > 0");
+			query.declareParameters("String urlParam");
+			query.setOrdering("location asc, degree desc");
+
+			List<News> nl = null;
+			try {
+				 nl = (List<News>) query.execute(url);
+			} finally {
+				query.closeAll();
+			}
+			System.out.println(nl.size());
+			for (News n : nl) {
+				System.out.println(n.getLocation() + ": " + n.getTitle());
+			}
 		} finally {
 			persistenceManager.close();
 		}
