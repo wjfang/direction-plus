@@ -21,6 +21,9 @@ public class News implements Serializable {
 	public static final int CLEARED		= 1;
 	public static final int UNKNOWN		= 0;
 	
+	public static final float INITIAL_LATITUDE	= -90; // South Pole: no travel news will happen in South Pole. 
+	public static final float INITIAL_LONGITUDE	= 180; // International Date Line: no travel news should happen there.
+	
 	@PrimaryKey
 	@Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
 	private Long id;
@@ -58,8 +61,8 @@ public class News implements Serializable {
 	 */
 	private String location;
 	private int degree;
-	private float latitude		= -90; // South Pole: no travel news will happen in South Pole. 
-	private float longitude		= 180; // International Date Line: no travel news should happen there.
+	private float latitude		= INITIAL_LATITUDE; 
+	private float longitude		= INITIAL_LONGITUDE;
 	
 	public News() {
 		
