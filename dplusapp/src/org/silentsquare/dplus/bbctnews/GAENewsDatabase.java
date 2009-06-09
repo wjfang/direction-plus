@@ -1,5 +1,6 @@
 package org.silentsquare.dplus.bbctnews;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -12,6 +13,7 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.PersistenceManagerFactory;
 import javax.jdo.Query;
 
+import org.silentsquare.dplus.bbctnews.CoordinateFinder.Coordinate;
 import org.silentsquare.dplus.bbctnews.UpdateProcess.State;
 
 public class GAENewsDatabase extends AbstractNewsDatabase {
@@ -159,8 +161,70 @@ public class GAENewsDatabase extends AbstractNewsDatabase {
 
 	private void doFindCoordinate(PersistenceManager persistenceManager,
 			UpdateProcess updateProcess, SystemInfo systemInfo) {
-		// TODO Auto-generated method stub
+		if (testFeedFinished(updateProcess))
+			return;
 		
+		Long id = updateProcess.getNewsIdList().get(updateProcess.getNewsIndex());
+		News news = persistenceManager.getObjectById(News.class, id);
+		String location = news.getLocation();
+		
+		/*
+		 * First check if there is an obsolete news with the same location;
+		 * if failed, use CoordinateFinder.
+		 */
+		
+		Coordinate co = findCachedCoordinate(persistenceManager, location);
+		if (co == null) {
+			co = coordinateFinder.search(location);
+		}
+		
+		if (co != null) {
+			news.setLatitude(co.getLatitude());
+			news.setLongitude(co.getLongitude());
+			persistenceManager.makePersistent(news);
+		}
+		
+		updateProcess.setNewsIndex(updateProcess.getNewsIndex() + 1);
+	}
+
+	private Coordinate findCachedCoordinate(PersistenceManager persistenceManager, String location) {
+		Query query = persistenceManager.newQuery(News.class);
+		query.setFilter("obsolete == true");
+		query.setFilter("location == locParam");
+		query.declareParameters("String locParam");
+
+		List<News> nl = null;
+		try {
+			 nl = (List<News>) query.execute(location);
+		} finally {
+			query.closeAll();
+		}
+		
+		Coordinate co = null;
+		for (News n : nl) {
+			if (n.getLatitude() != News.INITIAL_LATITUDE && n.getLongitude() != News.INITIAL_LONGITUDE) {
+				co = new Coordinate(n.getLatitude(), n.getLongitude());
+				break;
+			}
+		}
+
+		// Delete all obsolete news of the location because now there will be 
+		// an active news of the location.
+		for (News n : nl) {
+			persistenceManager.deletePersistent(n);
+		}
+		
+		return co;
+	}
+
+	private boolean testFeedFinished(UpdateProcess updateProcess) {
+		if (updateProcess.getNewsIndex() >= updateProcess.getNewsIdList().size()) {
+			// Done all new news in the feed
+			logUpdateInfo(updateProcess.getState(), "Found coordinates for all new news");
+			updateProcess.setState(State.READ_FEED);
+			return true;
+		} else
+			return false;
 	}
 
 	// Read a feed, merge its news with the current news, calculates new news, 
@@ -176,24 +240,32 @@ public class GAENewsDatabase extends AbstractNewsDatabase {
 		if (nl.size() == 0) {
 			updateProcess.setFeedIndex(updateProcess.getFeedIndex() + 1);
 			logUpdateInfo(State.READ_FEED, url + " is empty");
-			testUpdateFinished(updateProcess);
 			return;
 		}
 		
 		Collections.sort(nl, new Comparator<News>() {
 			@Override
 			public int compare(News n1, News n2) {
-				if (n1.getLocation() == null)
-					return -1;
-				else
-					return n1.getLocation().compareTo(n2.getLocation());
+				// It is guaranteed location is not null. see FeedReader.java.
+				return n1.getLocation().compareTo(n2.getLocation());
 			}			
 		});
 		
 		List<News> cl = getCurrentNews(persistenceManager, url);
-		
 		List<News> al = merge(nl, cl);
-		// TODO
+		persistenceManager.makePersistentAll(cl);
+		al = (List<News>) persistenceManager.makePersistentAll(al);
+		
+		List<Long> il = new ArrayList<Long>();
+		for (News an : al) {
+			il.add(an.getId());
+		}
+		
+		updateProcess.setFeedIndex(updateProcess.getFeedIndex() + 1);
+		updateProcess.setNewsIdList(il);
+		updateProcess.setNewsIndex(0);
+		updateProcess.setState(State.FIND_COORDINATE);
+		logUpdateInfo(State.READ_FEED, nl.size() + " read, " + al.size() + " created, " + cl.size() + " updated");
 	}
 
 	/**
@@ -203,9 +275,57 @@ public class GAENewsDatabase extends AbstractNewsDatabase {
 	 * @return a list of news in nl but not in cl
 	 */
 	private List<News> merge(List<News> nl, List<News> cl) {
+		List<News> al = new ArrayList<News>();
 		int i = 0, j = 0;
-		// TODO
-		return null;
+		while (i < nl.size() && j < cl.size()) {
+			News nn = nl.get(i);
+			News cn = cl.get(j);
+			int k = nn.getLocation().compareTo(cn.getLocation());
+			if (k < 0) {
+				// nn is a brand new news, add it to al
+				al.add(nn);
+				i++;
+			} else if (k == 0) {
+				// update cn with nn
+				updateNews(nn, cn);
+				i++;
+				j++;
+			} else { // k > 0
+				// cn is obsolet
+				cn.setObsolete(true);
+				j++;
+			}
+		}
+		
+		if (i == nl.size()) {
+			// make the remaining news in cl obsolete
+			for (; j < cl.size(); j++) {
+				cl.get(j).setObsolete(true);
+			}
+		}
+		
+		if (j == cl.size()) {
+			// add the remaining news in nl to al
+			for (; i < nl.size(); i++) {
+				al.add(nl.get(i));
+			}
+		}
+		
+		return al;
+	}
+
+	/**
+	 * Use the information in src to update dst
+	 * @param src
+	 * @param dst
+	 */
+	private void updateNews(News src, News dst) {
+		dst.setTitle(src.getTitle());
+		dst.setDescription(src.getDescription());
+		dst.setLink(src.getLink());
+		dst.setLocation(src.getLocation());
+		dst.setDegree(src.getDegree());
+		dst.setUpdateTime(System.currentTimeMillis());
 	}
 
 	// Return the current valid news sorted by location asc and then degree desc.
@@ -228,8 +348,8 @@ public class GAENewsDatabase extends AbstractNewsDatabase {
 	private boolean testUpdateFinished(UpdateProcess updateProcess) {
 		if (updateProcess.getFeedIndex() >= updateProcess.getFeedList().size()) {
 			// Done all feeds
-			updateProcess.setState(State.INIT);
 			logUpdateInfo(updateProcess.getState(), "All feeds processed");
+			updateProcess.setState(State.INIT);
 			return true;
 		} else
 			return false;
@@ -240,8 +360,8 @@ public class GAENewsDatabase extends AbstractNewsDatabase {
 			UpdateProcess updateProcess, SystemInfo systemInfo) {
 		List<String> feedList = feedListBuilder.build();
 		updateProcess.setFeedList(feedList);
-		updateProcess.setState(State.READ_FEED);
 		logUpdateInfo(State.BUILD_FEED_LIST, "Found " + feedList.size() + " feeds");
+		updateProcess.setState(State.READ_FEED);
 	}
 
 	// Reset updateProcess and create an updateStat
