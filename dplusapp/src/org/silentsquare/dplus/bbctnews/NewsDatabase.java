@@ -21,6 +21,10 @@ public interface NewsDatabase {
 	 * 
 	 * @return the current status of the news database.
 	 */
-	public Map<String, String> monitor();
+	public Map<String, List<StatusEntry>> monitor();
 	
+	public static class StatusEntry {
+		public String key;
+		public String value;
+	}
 }
