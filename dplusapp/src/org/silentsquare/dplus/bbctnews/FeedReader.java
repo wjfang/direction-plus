@@ -56,8 +56,11 @@ public class FeedReader {
 			String link = getElementText(item, "link");
 			News news = new News(url, title, description, link);
 			news.parseTitle();
+			if (news.getLocation() != null) {
+				// make sure this news is understood
+				list.add(news);
+			}
 			logger.finest(news.toString());
-			list.add(news);
 		}
 		
 		return list;
