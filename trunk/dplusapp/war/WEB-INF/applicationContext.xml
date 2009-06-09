@@ -26,35 +26,21 @@
 		<property name="apiKey" value="ABQIAAAAj1DqbVODIwfxFozz52vGCBTBKtqaU_qKk-cwvy6tFS36W-EYRhTQIx4Jc7ffCTqfgjkPZSJocVxSCA"/>
     </bean>
     
-    <!-- News Reader -->
-	<bean id="newsReader" class="org.silentsquare.dplus.bbctnews.NewsReader">
+    <!-- News database for Google App Engine -->
+	<bean id="gaeNewsDatabase" class="org.silentsquare.dplus.bbctnews.GAENewsDatabase">
+		<!-- Persistence manager factory name, see META-INF/jdoconfig.xml -->
+		<constructor-arg value="transactions-optional"/> 
     	<property name="feedListBuilder" ref="feedListBuilder"/>
+    	<property name="feedReader" ref="feedReader"/>
     	<property name="coordinateFinder" ref="coordinateFinder"/>
-    </bean>
-    
-    <!-- Test news databse which is file based and does not update
-	<bean id="testNewsDatabase" class="org.silentsquare.dplus.bbctnews.TestNewsDatabase">
-		<constructor-arg value="C:/Documents and Settings/wjfang/My Documents/workspace/dplusapp/news.db"/>
-    </bean>
-    -->
-    
-    <!-- Local news database that updates -->
-	<bean id="localNewsDatabase" class="org.silentsquare.dplus.bbctnews.LocalNewsDatabase">
-    	<property name="newsReader" ref="newsReader"/>
-    </bean>
-    
-    <!-- Incremental update news database -->
-	<bean id="incUpdateNewsDatabase" class="org.silentsquare.dplus.bbctnews.IncUpdateNewsDatabase">
-    	<property name="newsReader" ref="newsReader"/>
-    	<property name="expectedWallTime" value="20"/> <!-- in seconds -->
-    	<property name="persistenceManagerFactoryName" value="transactions-optional"/> <!-- see META-INF/jdoconfig.xml -->
+    	<property name="expectedUpdateWallTime" value="25"/> <!-- in seconds --> 
+    	<property name="systemInfoId" value="systemInfo"/>
+    	<property name="updateProcessId" value="updateProc"/>
     </bean>
 
 	<!-- The global configuration for D+ -->
     <bean id="configuration" class="org.silentsquare.dplus.Configuration">
-    	<!-- <property name="newsDatabase" ref="testNewsDatabase"/> -->
-    	<!-- <property name="newsDatabase" ref="localNewsDatabase"/> -->
-    	<property name="newsDatabase" ref="incUpdateNewsDatabase"/>
+    	<property name="newsDatabase" ref="gaeNewsDatabase"/>
     	<property name="updateKey" value="hellopiggy"/>
     </bean>
         
