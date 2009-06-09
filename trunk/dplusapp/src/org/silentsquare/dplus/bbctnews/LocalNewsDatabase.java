@@ -2,6 +2,7 @@ package org.silentsquare.dplus.bbctnews;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 /**
@@ -48,6 +49,12 @@ public class LocalNewsDatabase extends AbstractNewsDatabase {
 		logger.info("Finish updating news database: " + nl.size() + " news retrieved.");
 		newsList = nl;
 		updating = false;
+	}
+
+	@Override
+	public Map<String, List<StatusEntry>> monitor() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

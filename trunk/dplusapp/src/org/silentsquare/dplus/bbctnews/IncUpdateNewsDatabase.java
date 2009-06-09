@@ -1,6 +1,7 @@
 package org.silentsquare.dplus.bbctnews;
 
 import java.text.DateFormat;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -11,6 +12,8 @@ import java.util.logging.Logger;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.PersistenceManagerFactory;
+
+import org.silentsquare.dplus.bbctnews.NewsDatabase.StatusEntry;
 
 public class IncUpdateNewsDatabase extends LocalNewsDatabase {
 	
@@ -186,28 +189,29 @@ public class IncUpdateNewsDatabase extends LocalNewsDatabase {
 	}
 
 	@Override
-	public Map<String, String> monitor() {
-		Map<String, String> status = new HashMap<String, String>();
-		
-		status.put("The size of the news database in use", newsList.size() + "");
-		status.put("The updated time of the news database in use", formatTime(this.dbUpdatedTime));
-		
-		status.put("The startup time of D+", formatTime(this.startUpTime));
-		
-		status.put("The current update state", state.toString());
-		status.put("The current update index", index + "");
-		status.put("The last update wall time", formatWallTime(lastUpdateWallTime));
-		
-		status.put("The wall time spent in building feed list", 
-				formatWallTime(this.beginReadFeedTime - this.beginBuildFeedListTIme));
-		status.put("The wall time spent in reading feed", 
-				formatWallTime(this.beginFindCoordinateTime - this.beginReadFeedTime));
-		status.put("The wall time spent in finding coordinate", 
-				formatWallTime(this.beginFinishTime - this.beginFindCoordinateTime));
-		
-		status.put("The size of the news database being updated", newsReader.getNewsList().size() + "");
-		
-		return status;
+	public Map<String, List<StatusEntry>> monitor() {
+//		Map<String, String> status = new HashMap<String, String>();
+//		
+//		status.put("The size of the news database in use", newsList.size() + "");
+//		status.put("The updated time of the news database in use", formatTime(this.dbUpdatedTime));
+//		
+//		status.put("The startup time of D+", formatTime(this.startUpTime));
+//		
+//		status.put("The current update state", state.toString());
+//		status.put("The current update index", index + "");
+//		status.put("The last update wall time", formatWallTime(lastUpdateWallTime));
+//		
+//		status.put("The wall time spent in building feed list", 
+//				formatWallTime(this.beginReadFeedTime - this.beginBuildFeedListTIme));
+//		status.put("The wall time spent in reading feed", 
+//				formatWallTime(this.beginFindCoordinateTime - this.beginReadFeedTime));
+//		status.put("The wall time spent in finding coordinate", 
+//				formatWallTime(this.beginFinishTime - this.beginFindCoordinateTime));
+//		
+//		status.put("The size of the news database being updated", newsReader.getNewsList().size() + "");
+//		
+//		return status;
+		return Collections.EMPTY_MAP;
 	}
 
 	private String formatWallTime(long t) {
