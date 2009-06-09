@@ -7,8 +7,8 @@ import java.util.List;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
-import org.junit.After;
-import org.junit.Before;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.silentsquare.dplus.bbctnews.FeedReader;
 import org.silentsquare.dplus.bbctnews.News;
@@ -18,28 +18,29 @@ public class NewsJDOTestCase extends GAETestCase {
 	
 	private PersistenceManager persistenceManager;
 	
-	@Before
-	public void setUp() throws Exception {
-		super.setUp();
+	@BeforeClass
+	public static void setUpBeforeClass() throws Exception {
+		setUp();
 	}
 
-	@After
-	public void tearDown() throws Exception {
-		super.tearDown();
+	@AfterClass
+	public static void tearDownAfterClass() throws Exception {
+		tearDown();
 	}
 
+	private String url = "http://www.bbc.co.uk/travelnews/tpeg/en/local/rtm/bedfordshire_rss.xml"; 
+	private static long id;
+	
 	@Test
-	public void test() throws Exception {
+	public void testCreate() throws Exception {
 		FeedReader feedReader = new FeedReader();
-		List<News> list = feedReader.read("http://www.bbc.co.uk/travelnews/tpeg/en/local/rtm/bedfordshire_rss.xml");
+		List<News> list = feedReader.read(url);
 		
 		for (News n : list) {
 			assertNull(n.getId());
 		}		
 		
 		persistenceManager = persistenceManagerFactory.getPersistenceManager();
-		long id;
-		
 		try {
 			list = (List) persistenceManager.makePersistentAll(list);
 			for (News n : list) {
@@ -49,7 +50,10 @@ public class NewsJDOTestCase extends GAETestCase {
 		} finally {
 			persistenceManager.close();
 		}
-		
+	}
+	
+	@Test
+	public void testGet() throws Exception {
 		persistenceManager = persistenceManagerFactory.getPersistenceManager();
 		try {
 			News news = persistenceManager.getObjectById(News.class, id);
@@ -61,18 +65,6 @@ public class NewsJDOTestCase extends GAETestCase {
 	
 	@Test
 	public void testFindCurrent() throws Exception {
-		String url = "http://www.bbc.co.uk/travelnews/tpeg/en/local/rtm/bedfordshire_rss.xml";
-		
-		FeedReader feedReader = new FeedReader();
-		List<News> list = feedReader.read(url);
-		
-		persistenceManager = persistenceManagerFactory.getPersistenceManager();
-		try {
-			list = (List) persistenceManager.makePersistentAll(list);
-		} finally {
-			persistenceManager.close();
-		}
-		
 		persistenceManager = persistenceManagerFactory.getPersistenceManager();
 		try {
 			Query query = persistenceManager.newQuery(News.class);

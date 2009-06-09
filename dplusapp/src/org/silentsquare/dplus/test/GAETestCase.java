@@ -11,9 +11,9 @@ import com.google.apphosting.api.ApiProxy;
 
 public class GAETestCase {
 	
-	protected PersistenceManagerFactory persistenceManagerFactory;
+	protected static PersistenceManagerFactory persistenceManagerFactory;
 	
-	public void setUp() throws Exception {
+	protected static void setUp() throws Exception {
         ApiProxy.setEnvironmentForCurrentThread(new TestEnvironment());
         ApiProxy.setDelegate(new ApiProxyLocalImpl(new File(".")){});
         
@@ -24,7 +24,7 @@ public class GAETestCase {
 			JDOHelper.getPersistenceManagerFactory("transactions-optional");
     }
 
-    public void tearDown() throws Exception {
+	protected static void tearDown() throws Exception {
     	ApiProxyLocalImpl proxy = (ApiProxyLocalImpl) ApiProxy.getDelegate();
         LocalDatastoreService datastoreService = (LocalDatastoreService) proxy.getService("datastore_v3");
         datastoreService.clearProfiles();
