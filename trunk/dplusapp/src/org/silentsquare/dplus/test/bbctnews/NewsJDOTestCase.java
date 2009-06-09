@@ -88,5 +88,31 @@ public class NewsJDOTestCase extends GAETestCase {
 			persistenceManager.close();
 		}
 	}
+	
+	@Test
+	public void testQueryByLocation() throws Exception {
+		String location = "Balliol Road Kempston Hardwick";
+		
+		persistenceManager = persistenceManagerFactory.getPersistenceManager();
+		try {
+			Query query = persistenceManager.newQuery(News.class);
+			query.setFilter("obsolete == true");
+			query.setFilter("location == locParam");
+			query.declareParameters("String locParam");
+
+			List<News> nl = null;
+			try {
+				 nl = (List<News>) query.execute(location);
+			} finally {
+				query.closeAll();
+			}
+			System.out.println(nl.size());
+			for (News n : nl) {
+				System.out.println(n.getLocation());
+			}
+		} finally {
+			persistenceManager.close();
+		}
+	}
 
 }
