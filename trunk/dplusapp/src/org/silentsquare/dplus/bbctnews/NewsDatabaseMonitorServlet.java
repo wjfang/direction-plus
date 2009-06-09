@@ -2,6 +2,7 @@ package org.silentsquare.dplus.bbctnews;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -11,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.silentsquare.dplus.Configuration;
+import org.silentsquare.dplus.bbctnews.NewsDatabase.StatusEntry;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -40,24 +42,32 @@ public class NewsDatabaseMonitorServlet extends HttpServlet {
     
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		Map<String, String> status = newsDatabase.monitor();
+		Map<String, List<StatusEntry>> status = newsDatabase.monitor();
 		
 		PrintWriter pw = resp.getWriter();
 		pw.println("<html><head>");
-		
 		pw.println("<title>News Database Status</title>");
 		pw.println("<meta http-equiv='pragma' content='no-cache'>");
 	    pw.println("<meta http-equiv='cache-control' content='no-cache'>");
 	    pw.println("<meta http-equiv='expires' content='0'>");
 		pw.println("<style type='text/css'>td {border: thin solid black; padding: 0.5em;}</style>");
 		pw.println("</head><body>");
-		pw.println("<h3>News Database Status</h3>");
-		pw.println("<table>");
-		for (String key : status.keySet()) {
-			String value = status.get(key);
-			pw.println("<tr><td>" + key + "</td><td>" + value + "</td></tr>");
+		pw.println("<h2>News Database Status</h2>");
+		
+		for (String head : status.keySet()) {
+			outputTable(pw, head, status.get(head));
 		}
-		pw.println("</table></body></html>");
+		
+		pw.println("</body></html>");
 		pw.flush();
+	}
+
+	private void outputTable(PrintWriter pw, String head, List<StatusEntry> list) {
+		pw.println("<h3>" + head + "</h3>");
+		pw.println("<table>");
+		for (StatusEntry entry : list) {
+			pw.println("<tr><td>" + entry.key + "</td><td>" + entry.value + "</td></tr>");
+		}
+		pw.println("</table>");		
 	}	
 }
