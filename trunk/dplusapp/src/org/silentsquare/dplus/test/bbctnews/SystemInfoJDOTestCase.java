@@ -5,8 +5,8 @@ import static org.junit.Assert.*;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
-import org.junit.After;
-import org.junit.Before;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.silentsquare.dplus.bbctnews.SystemInfo;
 import org.silentsquare.dplus.test.GAETestCase;
@@ -15,14 +15,14 @@ public class SystemInfoJDOTestCase extends GAETestCase {
 	
 	private PersistenceManager persistenceManager;
 	
-	@Before
-	public void setUp() throws Exception {
-		super.setUp();
+	@BeforeClass
+	public static void setUpBeforeClass() throws Exception {
+		setUp();
 	}
 
-	@After
-	public void tearDown() throws Exception {
-		super.tearDown();
+	@AfterClass
+	public static void tearDownAfterClass() throws Exception {
+		tearDown();
 	}
 
 	@Test
