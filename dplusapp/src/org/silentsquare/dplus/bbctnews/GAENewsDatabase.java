@@ -1,9 +1,13 @@
 package org.silentsquare.dplus.bbctnews;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -89,14 +93,88 @@ public class GAENewsDatabase extends AbstractNewsDatabase {
 	
 	@Override
 	public Map<String, List<StatusEntry>> monitor() {
-		// TODO Auto-generated method stub
-		return null;
+		Map<String, List<StatusEntry>> statusMap = new HashMap<String, List<StatusEntry>>();
+		/*
+		 * Always check for SystemInfo first.
+		 */
+		statusMap.put("System Information", getSystemStatus());
+		statusMap.put("Update Process", getUpdateProcessStatus());		
+		return statusMap;
+	}
+
+	private List<StatusEntry> getUpdateProcessStatus() {
+		List<StatusEntry> statusList = new ArrayList<StatusEntry>();
+		
+		PersistenceManager persistenceManager = persistenceManagerFactory.getPersistenceManager();
+		try {
+			UpdateProcess updateProcess = persistenceManager.getObjectById(UpdateProcess.class, updateProcessId);
+			statusList.add(new StatusEntry("Current State", updateProcess.getState().toString()));
+			statusList.add(new StatusEntry("Current Feed Index", updateProcess.getFeedIndex() + ""));
+			statusList.add(new StatusEntry("Current News Index", updateProcess.getNewsIndex() + ""));
+		} finally {
+			persistenceManager.close();
+		}
+		
+		return statusList;
+	}
+
+	private List<StatusEntry> getSystemStatus() {
+		List<StatusEntry> statusList = new ArrayList<StatusEntry>();
+		
+		PersistenceManager persistenceManager = persistenceManagerFactory.getPersistenceManager();
+		try {
+			SystemInfo systemInfo = getSystemInfo(persistenceManager);
+			statusList.add(new StatusEntry("Startup Time", formatTime(systemInfo.getStartUpTime())));	
+		} finally {
+			persistenceManager.close();
+		}
+		
+		return statusList;
+	}
+	
+	private DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL, Locale.UK);
+	
+	private String formatTime(long time) {
+		if (time == 0)
+			return "N/A";
+		
+		Date date = new Date(time);
+		return dateFormat.format(date);		
 	}
 
 	@Override
 	public List<News> query(List<float[]> waypoints) {
-		// TODO Auto-generated method stub
-		return null;
+		if (waypoints == null || waypoints.size() < 2) {
+			logger.severe("There is less than 2 waypoints. Return an empty list.");
+			return Collections.EMPTY_LIST;
+		}
+		
+		Rectangle rec = calculateRectangle(waypoints);
+		
+		List<News> nl = findNewsByLatRange(rec.bottom, rec.top);
+			
+		return lookUpInList(waypoints, nl);
+	}
+
+	private List<News> findNewsByLatRange(float bottom, float top) {
+		List<News> nl = Collections.EMPTY_LIST;
+		PersistenceManager persistenceManager = persistenceManagerFactory.getPersistenceManager();
+		try {
+			Query query = persistenceManager.newQuery(News.class);
+			query.setFilter("obsolete == false && latitude >= bottom && latitude <= top");
+			query.declareParameters("float bottom, float top");
+			query.setOrdering("latitude asc");
+
+			try {
+				 nl = (List<News>) query.execute(bottom, top);
+			} finally {
+				query.closeAll();
+			}
+		} finally {
+			persistenceManager.close();
+		}
+		logger.info("Found " + nl.size() + " news relevant to the input waypoints.");
+		return nl;
 	}
 
 	@Override
@@ -122,15 +200,10 @@ public class GAENewsDatabase extends AbstractNewsDatabase {
 	}
 
 	private void doUpdate(PersistenceManager persistenceManager) {
-		SystemInfo systemInfo = null;
-		try {
-			systemInfo = persistenceManager.getObjectById(SystemInfo.class, systemInfoId);
-		} catch (JDOObjectNotFoundException e) {
-			logger.warning("SystemInfo has not been created. This should mean the startup of the application.");
-			initDataStore(persistenceManager);
-			return;
-		}
-		
+		/*
+		 * Always check for SystemInfo first.
+		 */
+		SystemInfo systemInfo = getSystemInfo(persistenceManager);		
 		UpdateProcess updateProcess = persistenceManager.getObjectById(UpdateProcess.class, updateProcessId);
 		
 		switch (updateProcess.getState()) {
@@ -155,8 +228,20 @@ public class GAENewsDatabase extends AbstractNewsDatabase {
 				logger.severe("Unknown update process state: " + updateProcess.getState());
 		}
 		
-		persistenceManager.makePersistent(updateProcess);
 		persistenceManager.makePersistent(systemInfo);
+		persistenceManager.makePersistent(updateProcess);
+	}
+
+	private SystemInfo getSystemInfo(PersistenceManager persistenceManager) {
+		SystemInfo systemInfo = null;
+		try {
+			systemInfo = persistenceManager.getObjectById(SystemInfo.class, systemInfoId);
+		} catch (JDOObjectNotFoundException e) {
+			logger.warning("SystemInfo has not been created. This should mean the startup of the application.");
+			initDataStore(persistenceManager);
+			systemInfo = persistenceManager.getObjectById(SystemInfo.class, systemInfoId);
+		}
+		return systemInfo;
 	}
 
 	private void doFindCoordinate(PersistenceManager persistenceManager,
@@ -189,8 +274,7 @@ public class GAENewsDatabase extends AbstractNewsDatabase {
 
 	private Coordinate findCachedCoordinate(PersistenceManager persistenceManager, String location) {
 		Query query = persistenceManager.newQuery(News.class);
-		query.setFilter("obsolete == true");
-		query.setFilter("location == locParam");
+		query.setFilter("obsolete == true && location == locParam");
 		query.declareParameters("String locParam");
 
 		List<News> nl = null;
@@ -251,7 +335,7 @@ public class GAENewsDatabase extends AbstractNewsDatabase {
 			}			
 		});
 		
-		List<News> cl = getCurrentNews(persistenceManager, url);
+		List<News> cl = findCurrentNews(persistenceManager, url);
 		List<News> al = merge(nl, cl);
 		persistenceManager.makePersistentAll(cl);
 		al = (List<News>) persistenceManager.makePersistentAll(al);
@@ -329,10 +413,9 @@ public class GAENewsDatabase extends AbstractNewsDatabase {
 	}
 
 	// Return the current valid news sorted by location asc and then degree desc.
-	private List<News> getCurrentNews(PersistenceManager persistenceManager, String url) {
+	private List<News> findCurrentNews(PersistenceManager persistenceManager, String url) {
 		Query query = persistenceManager.newQuery(News.class);
-		query.setFilter("url == urlParam");
-		query.setFilter("obsolete == false");
+		query.setFilter("obsolete == false && url == urlParam");
 		query.declareParameters("String urlParam");
 		query.setOrdering("location asc, degree desc");
 
@@ -386,10 +469,12 @@ public class GAENewsDatabase extends AbstractNewsDatabase {
 		SystemInfo systemInfo = new SystemInfo();
 		systemInfo.setId(systemInfoId);
 		systemInfo.setStartUpTime(System.currentTimeMillis());
+		persistenceManager.makePersistent(systemInfo);
 		logger.info("Created the systemInfo");
 		
 		UpdateProcess updateProcess = new UpdateProcess();
 		updateProcess.setId(updateProcessId);
+		persistenceManager.makePersistent(updateProcess);
 		logger.info("Created the updateProcess");
 	}
 

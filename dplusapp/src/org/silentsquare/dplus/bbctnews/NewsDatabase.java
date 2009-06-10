@@ -26,5 +26,10 @@ public interface NewsDatabase {
 	public static class StatusEntry {
 		public String key;
 		public String value;
+		
+		public StatusEntry(String k, String v) {
+			this.key = k;
+			this.value = v;
+		}
 	}
 }

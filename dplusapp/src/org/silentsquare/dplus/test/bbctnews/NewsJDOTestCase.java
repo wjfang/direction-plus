@@ -54,13 +54,16 @@ public class NewsJDOTestCase extends GAETestCase {
 	
 	@Test
 	public void testGet() throws Exception {
+		News news = null;
 		persistenceManager = persistenceManagerFactory.getPersistenceManager();
 		try {
-			News news = persistenceManager.getObjectById(News.class, id);
+			news = persistenceManager.getObjectById(News.class, id);
 			System.out.println(news);
 		} finally {
 			persistenceManager.close();
 		}
+		System.out.println(news);
+		news.setTitle("hello");
 	}
 	
 	@Test
@@ -68,9 +71,7 @@ public class NewsJDOTestCase extends GAETestCase {
 		persistenceManager = persistenceManagerFactory.getPersistenceManager();
 		try {
 			Query query = persistenceManager.newQuery(News.class);
-			query.setFilter("url == urlParam");
-			query.setFilter("obsolete == false");
-//			query.setFilter("createTime > 0");
+			query.setFilter("obsolete == false && url == urlParam");
 			query.declareParameters("String urlParam");
 			query.setOrdering("location asc, degree desc");
 
@@ -82,7 +83,7 @@ public class NewsJDOTestCase extends GAETestCase {
 			}
 			System.out.println(nl.size());
 			for (News n : nl) {
-				System.out.println(n.getLocation() + ": " + n.getTitle());
+				System.out.println(n.getLocation() + ": " + n.getLatitude());
 			}
 		} finally {
 			persistenceManager.close();
@@ -96,8 +97,7 @@ public class NewsJDOTestCase extends GAETestCase {
 		persistenceManager = persistenceManagerFactory.getPersistenceManager();
 		try {
 			Query query = persistenceManager.newQuery(News.class);
-			query.setFilter("obsolete == true");
-			query.setFilter("location == locParam");
+			query.setFilter("obsolete == true && location == locParam");
 			query.declareParameters("String locParam");
 
 			List<News> nl = null;
@@ -113,6 +113,37 @@ public class NewsJDOTestCase extends GAETestCase {
 		} finally {
 			persistenceManager.close();
 		}
+	}
+	
+	@Test
+	public void testQueryByLatRange() throws Exception {
+		float top = 70;
+		float bottom = -90; 
+		List<News> nl = null;
+		
+		persistenceManager = persistenceManagerFactory.getPersistenceManager();
+		try {
+			Query query = persistenceManager.newQuery(News.class);
+			query.setFilter("obsolete == false && latitude <= top && latitude >= bottom");
+			query.declareParameters("float top, float bottom");
+			query.setOrdering("latitude asc");
+
+			try {
+				 nl = (List<News>) query.execute(top, bottom);
+			} finally {
+				query.closeAll();
+			}
+			System.out.println(nl.size());
+			for (News n : nl) {
+				System.out.println(n.getLocation() + ": " + n.getLatitude());
+			}
+		} finally {
+			persistenceManager.close();
+		}
+		
+		System.out.println(nl.get(0));
+		
+		nl.get(0).setDegree(0);
 	}
 
 }

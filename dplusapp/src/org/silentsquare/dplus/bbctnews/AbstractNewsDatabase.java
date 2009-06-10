@@ -52,16 +52,26 @@ public abstract class AbstractNewsDatabase implements NewsDatabase {
 	
 	/**
 	 * Query implementation for a News List.
-	 * @param waypoints
+	 * @param waypoints must have more than 2 elements.
 	 * @param newslist a News List sorted by latitude.
 	 * @return
 	 */
-	protected List<News> lookUpInList(List<float[]> waypoints, List<News> newslist) {
-		if (waypoints == null || waypoints.size() < 2 || newslist == null) {
-			throw new IllegalArgumentException(
-					"waypoints must have at least two elements and newslist cannot be null.");
-		}
+	protected List<News> lookUpInList(List<float[]> waypoints, List<News> newslist) {		
+		List<News> cadidates = lookUpInList(calculateRectangle(waypoints), newslist);
 		
+		/*
+		 * Must be sorted before passed to loolUpInList().
+		 */
+		Collections.sort(cadidates, latitudeComparator);
+		
+		List<News> results = new ArrayList<News>();
+		for (int i= 0, j = 1; j < waypoints.size(); i++, j++) {
+			results.addAll(lookUpInList(waypoints.get(i), waypoints.get(j), cadidates));
+		}
+		return results;
+	}
+	
+	protected Rectangle calculateRectangle(List<float[]> waypoints) {
 		float bottom = 90;
 		float top = -90;
 		float left = 180;
@@ -77,17 +87,7 @@ public abstract class AbstractNewsDatabase implements NewsDatabase {
 				right = p[1];
 		}
 		
-		List<News> cadidates = lookUpInList(new Rectangle(bottom, top, left, right), newslist);
-		/*
-		 * Must be sorted before passed to loolUpInList().
-		 */
-		Collections.sort(cadidates, latitudeComparator);
-		
-		List<News> results = new ArrayList<News>();
-		for (int i= 0, j = 1; j < waypoints.size(); i++, j++) {
-			results.addAll(lookUpInList(waypoints.get(i), waypoints.get(j), cadidates));
-		}
-		return results;
+		return new Rectangle(bottom, top, left, right);
 	}
 	
 	/**
