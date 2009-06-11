@@ -3,7 +3,6 @@ package org.silentsquare.dplus.bbctnews;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
@@ -13,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.silentsquare.dplus.Configuration;
 import org.silentsquare.dplus.bbctnews.NewsDatabase.StatusEntry;
+import org.silentsquare.dplus.bbctnews.NewsDatabase.StatusPart;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -42,7 +42,7 @@ public class NewsDatabaseMonitorServlet extends HttpServlet {
     
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		Map<String, List<StatusEntry>> status = newsDatabase.monitor();
+		List<StatusPart> status = newsDatabase.monitor();
 		
 		PrintWriter pw = resp.getWriter();
 		pw.println("<html><head>");
@@ -54,8 +54,8 @@ public class NewsDatabaseMonitorServlet extends HttpServlet {
 		pw.println("</head><body>");
 		pw.println("<h2>News Database Status</h2>");
 		
-		for (String head : status.keySet()) {
-			outputTable(pw, head, status.get(head));
+		for (StatusPart part : status) {
+			outputTable(pw, part.title, part.content);
 		}
 		
 		pw.println("</body></html>");

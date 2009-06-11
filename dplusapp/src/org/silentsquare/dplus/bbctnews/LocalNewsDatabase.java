@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import org.silentsquare.dplus.bbctnews.NewsDatabase.StatusPart;
+
 /**
  * In memory, persistent database.
  * @author wjfang
@@ -52,7 +54,7 @@ public class LocalNewsDatabase extends AbstractNewsDatabase {
 	}
 
 	@Override
-	public Map<String, List<StatusEntry>> monitor() {
+	public List<StatusPart> monitor() {
 		// TODO Auto-generated method stub
 		return null;
 	}

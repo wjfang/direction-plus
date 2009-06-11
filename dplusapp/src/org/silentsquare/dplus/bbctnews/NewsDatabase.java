@@ -1,7 +1,6 @@
 package org.silentsquare.dplus.bbctnews;
 
 import java.util.List;
-import java.util.Map;
 
 public interface NewsDatabase {
 	
@@ -21,7 +20,17 @@ public interface NewsDatabase {
 	 * 
 	 * @return the current status of the news database.
 	 */
-	public Map<String, List<StatusEntry>> monitor();
+	public List<StatusPart> monitor();
+	
+	public static class StatusPart {
+		public String title;
+		public List<StatusEntry> content;
+		
+		public StatusPart(String t, List<StatusEntry> c) {
+			this.title = t;
+			this.content = c;
+		}
+	}
 	
 	public static class StatusEntry {
 		public String key;
