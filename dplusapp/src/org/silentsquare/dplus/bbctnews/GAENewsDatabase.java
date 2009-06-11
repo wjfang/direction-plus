@@ -302,7 +302,12 @@ public class GAENewsDatabase extends AbstractNewsDatabase {
 	}
 
 	private boolean testFeedFinished(UpdateProcess updateProcess) {
-		if (updateProcess.getNewsIndex() >= updateProcess.getNewsIdList().size()) {
+		if (updateProcess.getNewsIdList() == null || 
+				updateProcess.getNewsIndex() >= updateProcess.getNewsIdList().size()) {
+			/*
+			 * I suspect when a JDO is retrieved from the data store, an empty list will be
+			 * represented by a null.
+			 */
 			// Done all new news in the feed
 			logUpdateInfo(updateProcess.getState(), "Found coordinates for all new news");
 			updateProcess.setState(State.READ_FEED);
@@ -429,7 +434,8 @@ public class GAENewsDatabase extends AbstractNewsDatabase {
 	}
 
 	private boolean testUpdateFinished(UpdateProcess updateProcess) {
-		if (updateProcess.getFeedIndex() >= updateProcess.getFeedList().size()) {
+		if (updateProcess.getFeedList() == null || 
+				updateProcess.getFeedIndex() >= updateProcess.getFeedList().size()) {
 			// Done all feeds
 			logUpdateInfo(updateProcess.getState(), "All feeds processed");
 			updateProcess.setState(State.INIT);
