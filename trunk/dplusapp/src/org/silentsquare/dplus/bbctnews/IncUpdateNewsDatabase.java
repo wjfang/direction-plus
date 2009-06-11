@@ -3,10 +3,8 @@ package org.silentsquare.dplus.bbctnews;
 import java.text.DateFormat;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.jdo.JDOHelper;
@@ -14,6 +12,7 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.PersistenceManagerFactory;
 
 import org.silentsquare.dplus.bbctnews.NewsDatabase.StatusEntry;
+import org.silentsquare.dplus.bbctnews.NewsDatabase.StatusPart;
 
 public class IncUpdateNewsDatabase extends LocalNewsDatabase {
 	
@@ -189,7 +188,7 @@ public class IncUpdateNewsDatabase extends LocalNewsDatabase {
 	}
 
 	@Override
-	public Map<String, List<StatusEntry>> monitor() {
+	public List<StatusPart> monitor() {
 //		Map<String, String> status = new HashMap<String, String>();
 //		
 //		status.put("The size of the news database in use", newsList.size() + "");
@@ -211,7 +210,7 @@ public class IncUpdateNewsDatabase extends LocalNewsDatabase {
 //		status.put("The size of the news database being updated", newsReader.getNewsList().size() + "");
 //		
 //		return status;
-		return Collections.EMPTY_MAP;
+		return Collections.EMPTY_LIST;
 	}
 
 	private String formatWallTime(long t) {
