@@ -2,7 +2,10 @@ package org.silentsquare.dplus.test.bbctnews;
 
 import static org.junit.Assert.*;
 
+import java.util.List;
+
 import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -47,6 +50,26 @@ public class UpdateStatJDOTestCase extends GAETestCase {
 		} finally {
 			persistenceManager.close();
 		}
+	}
+	
+	@Test
+	public void testFindLast() throws Exception {
+		persistenceManager = persistenceManagerFactory.getPersistenceManager();
+		try {
+			Query query = persistenceManager.newQuery(UpdateStat.class);
+		    query.setOrdering("startTime desc");
+		    query.setRange(0, 2);
+		    try {
+		        List<UpdateStat> list = (List<UpdateStat>) query.execute();
+		        System.out.println(list.size());
+		    } finally {
+		        query.closeAll();
+		    }
+		} finally {
+			persistenceManager.close();
+		}
+		
+		
 	}
 
 }
