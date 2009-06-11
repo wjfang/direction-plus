@@ -18,6 +18,7 @@ import javax.jdo.PersistenceManagerFactory;
 import javax.jdo.Query;
 
 import org.silentsquare.dplus.bbctnews.CoordinateFinder.Coordinate;
+import org.silentsquare.dplus.bbctnews.NewsDatabase.StatusEntry;
 import org.silentsquare.dplus.bbctnews.UpdateProcess.State;
 
 public class GAENewsDatabase extends AbstractNewsDatabase {
@@ -92,14 +93,39 @@ public class GAENewsDatabase extends AbstractNewsDatabase {
 	}
 	
 	@Override
-	public Map<String, List<StatusEntry>> monitor() {
-		Map<String, List<StatusEntry>> statusMap = new HashMap<String, List<StatusEntry>>();
+	public List<StatusPart> monitor() {
+		long begin = System.currentTimeMillis();
+		List<StatusPart> status = new ArrayList<StatusPart>();
 		/*
 		 * Always check for SystemInfo first.
 		 */
-		statusMap.put("System Information", getSystemStatus());
-		statusMap.put("Update Process", getUpdateProcessStatus());		
-		return statusMap;
+		status.add(new StatusPart("System Information", getSystemStatus()));
+		status.add(new StatusPart("Current Update Process", getUpdateProcessStatus()));
+		status.add(new StatusPart("Last Update Process", getLastUpdateStat()));
+		
+		logger.info("Monitor walltime: " + (System.currentTimeMillis() - begin) + " ms");	
+		return status;
+	}
+
+	private List<StatusEntry> getLastUpdateStat() {
+		PersistenceManager persistenceManager = persistenceManagerFactory.getPersistenceManager();
+		try {
+			Query query = persistenceManager.newQuery(UpdateStat.class);
+		    query.setOrdering("startTime desc");
+		    query.setRange(0, 2);
+		    List<UpdateStat> statlist = Collections.EMPTY_LIST;
+		    try {
+		        statlist = (List<UpdateStat>) query.execute();
+		        if (statlist.size() >= 2)
+		        	return formatUpdateStat(statlist.get(1));
+		        else
+		        	return Collections.EMPTY_LIST;
+		    } finally {
+		        query.closeAll();
+		    }
+		} finally {
+			persistenceManager.close();
+		}
 	}
 
 	private List<StatusEntry> getUpdateProcessStatus() {
@@ -108,13 +134,27 @@ public class GAENewsDatabase extends AbstractNewsDatabase {
 		PersistenceManager persistenceManager = persistenceManagerFactory.getPersistenceManager();
 		try {
 			UpdateProcess updateProcess = persistenceManager.getObjectById(UpdateProcess.class, updateProcessId);
-			statusList.add(new StatusEntry("Current State", updateProcess.getState().toString()));
-			statusList.add(new StatusEntry("Current Feed Index", updateProcess.getFeedIndex() + ""));
-			statusList.add(new StatusEntry("Current News Index", updateProcess.getNewsIndex() + ""));
+			statusList.add(new StatusEntry("State", updateProcess.getState().toString()));
+			statusList.add(new StatusEntry("Feed Index", updateProcess.getFeedIndex() + ""));
+			statusList.add(new StatusEntry("News Index", updateProcess.getNewsIndex() + ""));
+			
+			UpdateStat updateStat = persistenceManager.getObjectById(
+					UpdateStat.class, updateProcess.getUpdateStatId());
+			statusList.addAll(formatUpdateStat(updateStat));			
 		} finally {
 			persistenceManager.close();
 		}
 		
+		return statusList;
+	}
+	
+	private List<StatusEntry> formatUpdateStat(UpdateStat updateStat) {
+		List<StatusEntry> statusList = new ArrayList<StatusEntry>();
+		statusList.add(new StatusEntry("Start Time", formatTime(updateStat.getStartTime())));
+		statusList.add(new StatusEntry("Finish Time", formatTime(updateStat.getFinishTime())));
+		statusList.add(new StatusEntry("Retrieved News", updateStat.getTotalNum() + ""));
+		statusList.add(new StatusEntry("New News", updateStat.getNewNum() + ""));
+		statusList.add(new StatusEntry("Coordinate Cache Hits", updateStat.getComeBackNum() + ""));
 		return statusList;
 	}
 
@@ -144,6 +184,8 @@ public class GAENewsDatabase extends AbstractNewsDatabase {
 
 	@Override
 	public List<News> query(List<float[]> waypoints) {
+		long begin = System.currentTimeMillis();
+		
 		if (waypoints == null || waypoints.size() < 2) {
 			logger.severe("There is less than 2 waypoints. Return an empty list.");
 			return Collections.EMPTY_LIST;
@@ -152,7 +194,7 @@ public class GAENewsDatabase extends AbstractNewsDatabase {
 		Rectangle rec = calculateRectangle(waypoints);
 		
 		List<News> nl = findNewsByLatRange(rec.bottom, rec.top);
-			
+		logger.info("Query walltime: " + (System.currentTimeMillis() - begin) + " ms");	
 		return lookUpInList(waypoints, nl);
 	}
 
@@ -196,7 +238,7 @@ public class GAENewsDatabase extends AbstractNewsDatabase {
 			endDoUpdate = System.currentTimeMillis();
 		}		
 		
-		logger.info("Update walltime: " + (System.currentTimeMillis() - beginUpdate));
+		logger.info("Update walltime: " + (System.currentTimeMillis() - beginUpdate) + " ms");
 	}
 
 	private void doUpdate(PersistenceManager persistenceManager) {
@@ -253,20 +295,29 @@ public class GAENewsDatabase extends AbstractNewsDatabase {
 		News news = persistenceManager.getObjectById(News.class, id);
 		String location = news.getLocation();
 		
+		UpdateStat updateStat = persistenceManager.getObjectById(
+				UpdateStat.class, updateProcess.getUpdateStatId());
+		
 		/*
 		 * First check if there is an obsolete news with the same location;
 		 * if failed, use CoordinateFinder.
-		 */
-		
+		 */		
 		Coordinate co = findCachedCoordinate(persistenceManager, location);
 		if (co == null) {
 			co = coordinateFinder.search(location);
+		} else {
+			// Found a cached coordinate
+			updateStat.setComeBackNum(updateStat.getComeBackNum() + 1);
+			persistenceManager.makePersistent(updateStat);
 		}
 		
 		if (co != null) {
 			news.setLatitude(co.getLatitude());
 			news.setLongitude(co.getLongitude());
 			persistenceManager.makePersistent(news);
+		} else {
+			// Can not find coordinate, no need to keep this news.
+			persistenceManager.deletePersistent(news);
 		}
 		
 		updateProcess.setNewsIndex(updateProcess.getNewsIndex() + 1);
@@ -354,6 +405,13 @@ public class GAENewsDatabase extends AbstractNewsDatabase {
 		updateProcess.setNewsIdList(il);
 		updateProcess.setNewsIndex(0);
 		updateProcess.setState(State.FIND_COORDINATE);
+		
+		UpdateStat updateStat = persistenceManager.getObjectById(
+				UpdateStat.class, updateProcess.getUpdateStatId());
+		updateStat.setTotalNum(updateStat.getTotalNum() + nl.size());
+		updateStat.setNewNum(updateStat.getNewNum() + al.size());
+		persistenceManager.makePersistent(updateStat);
+		
 		logUpdateInfo(State.READ_FEED, nl.size() + " read, " + al.size() + " created, " + cl.size() + " updated");
 	}
 
@@ -456,6 +514,13 @@ public class GAENewsDatabase extends AbstractNewsDatabase {
 	// Reset updateProcess and create an updateStat
 	private void doInit(PersistenceManager persistenceManager,
 			UpdateProcess updateProcess, SystemInfo systemInfo) {
+		if (updateProcess.getUpdateStatId() != null && updateProcess.getUpdateStatId() != 0) {
+			UpdateStat updateStat = persistenceManager.getObjectById(
+					UpdateStat.class, updateProcess.getUpdateStatId());
+			updateStat.setFinishTime(System.currentTimeMillis());
+			persistenceManager.makePersistent(updateStat);
+		}
+		
 		UpdateStat updateStat = new UpdateStat();
 		updateStat.setStartTime(System.currentTimeMillis());
 		updateStat = persistenceManager.makePersistent(updateStat);
