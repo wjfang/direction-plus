@@ -82,6 +82,16 @@ public class GAENewsDatabase extends AbstractNewsDatabase {
 		this.updateProcessId = updateProcessId;
 	}
 	
+	private String veryLargeFeed;
+	
+	public String getVeryLargeFeed() {
+		return veryLargeFeed;
+	}
+	
+	public void setVeryLargeFeed(String veryLargeFeed) {
+		this.veryLargeFeed = veryLargeFeed;
+	}
+	
 	private PersistenceManagerFactory persistenceManagerFactory;
 	
 	public GAENewsDatabase(String persistenceManagerFactoryName) {
@@ -134,6 +144,10 @@ public class GAENewsDatabase extends AbstractNewsDatabase {
 			statusList.add(new StatusEntry("State", updateProcess.getState().toString()));
 			statusList.add(new StatusEntry("Feed Index", updateProcess.getFeedIndex() + ""));
 			statusList.add(new StatusEntry("News Index", updateProcess.getNewsIndex() + ""));
+			statusList.add(new StatusEntry("Feed In Process", 
+					updateProcess.getFeedIndex() == 0 ?
+							updateProcess.getFeedList().get(0) :
+								updateProcess.getFeedList().get(updateProcess.getFeedIndex() - 1)));
 			
 			UpdateStat updateStat = persistenceManager.getObjectById(
 					UpdateStat.class, updateProcess.getUpdateStatId());
@@ -221,15 +235,29 @@ public class GAENewsDatabase extends AbstractNewsDatabase {
 		return nl;
 	}
 
+	/*
+	 * True if this update should stop, so that some action can be run at the very beginning of the next update,
+	 * giving it plenty of time. 
+	 */
+	private boolean stopUpdate;
+	
+	/*
+	 * True if now is the very beginning the update.
+	 */
+	private boolean firstInUpdate;
+	
 	@Override
 	public void update() {
 		long beginUpdate = System.currentTimeMillis();
 		long beginDoUpdate = beginUpdate;
 		long endDoUpdate = beginUpdate;
 		
+		firstInUpdate = true;
+		stopUpdate = false;
+		
 		int safeRatio = 4;
 		while (endDoUpdate + (endDoUpdate - beginDoUpdate) * safeRatio < 
-				beginUpdate + expectedUpdateWallTime * 1000) {
+				beginUpdate + expectedUpdateWallTime * 1000 && !stopUpdate) {
 			beginDoUpdate = System.currentTimeMillis();
 			PersistenceManager persistenceManager = persistenceManagerFactory.getPersistenceManager();
 			try {
@@ -238,6 +266,7 @@ public class GAENewsDatabase extends AbstractNewsDatabase {
 				persistenceManager.close();
 			}
 			endDoUpdate = System.currentTimeMillis();
+			firstInUpdate = false;
 		}		
 		
 		logger.info("Update walltime: " + (System.currentTimeMillis() - beginUpdate) + " ms");
@@ -377,6 +406,12 @@ public class GAENewsDatabase extends AbstractNewsDatabase {
 			return;
 		
 		String url = updateProcess.getFeedList().get(updateProcess.getFeedIndex());
+		
+		if (veryLargeFeed.equals(url) && !firstInUpdate) {
+			stopUpdate = true;
+			return;
+		}
+		
 		List<News> nl = feedReader.read(url);
 		
 		if (nl.size() == 0) {
