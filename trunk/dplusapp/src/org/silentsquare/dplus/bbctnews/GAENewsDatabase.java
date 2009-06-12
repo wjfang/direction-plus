@@ -5,10 +5,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.jdo.JDOHelper;
@@ -18,7 +16,6 @@ import javax.jdo.PersistenceManagerFactory;
 import javax.jdo.Query;
 
 import org.silentsquare.dplus.bbctnews.CoordinateFinder.Coordinate;
-import org.silentsquare.dplus.bbctnews.NewsDatabase.StatusEntry;
 import org.silentsquare.dplus.bbctnews.UpdateProcess.State;
 
 public class GAENewsDatabase extends AbstractNewsDatabase {
@@ -154,7 +151,7 @@ public class GAENewsDatabase extends AbstractNewsDatabase {
 		statusList.add(new StatusEntry("Finish Time", formatTime(updateStat.getFinishTime())));
 		statusList.add(new StatusEntry("Retrieved News", updateStat.getTotalNum() + ""));
 		statusList.add(new StatusEntry("New News", updateStat.getNewNum() + ""));
-		statusList.add(new StatusEntry("Coordinate Cache Hits", updateStat.getComeBackNum() + ""));
+		statusList.add(new StatusEntry("Coordinate Cache Hits", updateStat.getCoordinateHitNum() + ""));
 		return statusList;
 	}
 
@@ -164,7 +161,12 @@ public class GAENewsDatabase extends AbstractNewsDatabase {
 		PersistenceManager persistenceManager = persistenceManagerFactory.getPersistenceManager();
 		try {
 			SystemInfo systemInfo = getSystemInfo(persistenceManager);
-			statusList.add(new StatusEntry("Startup Time", formatTime(systemInfo.getStartUpTime())));	
+			statusList.add(new StatusEntry("Startup Time", formatTime(systemInfo.getStartUpTime())));
+			statusList.add(new StatusEntry("Completed Updates", systemInfo.getUpdateNum() + ""));
+			statusList.add(new StatusEntry("Average Update Time (sec)", 
+					systemInfo.getUpdateNum() == 0 ? "N/A" :
+						(System.currentTimeMillis() - systemInfo.getStartUpTime()) / 
+						systemInfo.getUpdateNum() / 1000 + ""));
 		} finally {
 			persistenceManager.close();
 		}
@@ -307,7 +309,7 @@ public class GAENewsDatabase extends AbstractNewsDatabase {
 			co = coordinateFinder.search(location);
 		} else {
 			// Found a cached coordinate
-			updateStat.setComeBackNum(updateStat.getComeBackNum() + 1);
+			updateStat.setCoordinateHitNum(updateStat.getCoordinateHitNum() + 1);
 			persistenceManager.makePersistent(updateStat);
 		}
 		
@@ -371,7 +373,7 @@ public class GAENewsDatabase extends AbstractNewsDatabase {
 	// put them in updateProcess.newsIdList.
 	private void doReadFeed(PersistenceManager persistenceManager,
 			UpdateProcess updateProcess, SystemInfo systemInfo) {
-		if (testUpdateFinished(updateProcess))
+		if (testUpdateFinished(updateProcess, systemInfo))
 			return;
 		
 		String url = updateProcess.getFeedList().get(updateProcess.getFeedIndex());
@@ -491,12 +493,13 @@ public class GAENewsDatabase extends AbstractNewsDatabase {
 		return nl;
 	}
 
-	private boolean testUpdateFinished(UpdateProcess updateProcess) {
+	private boolean testUpdateFinished(UpdateProcess updateProcess, SystemInfo systemInfo) {
 		if (updateProcess.getFeedList() == null || 
 				updateProcess.getFeedIndex() >= updateProcess.getFeedList().size()) {
 			// Done all feeds
 			logUpdateInfo(updateProcess.getState(), "All feeds processed");
 			updateProcess.setState(State.INIT);
+			systemInfo.setUpdateNum(systemInfo.getUpdateNum() + 1);
 			return true;
 		} else
 			return false;
