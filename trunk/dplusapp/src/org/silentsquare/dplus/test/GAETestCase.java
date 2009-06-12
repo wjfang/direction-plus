@@ -20,8 +20,9 @@ public class GAETestCase {
         ApiProxyLocalImpl proxy = (ApiProxyLocalImpl) ApiProxy.getDelegate();
         proxy.setProperty(LocalDatastoreService.NO_STORAGE_PROPERTY, Boolean.TRUE.toString());
         
-        persistenceManagerFactory =
-			JDOHelper.getPersistenceManagerFactory("transactions-optional");
+        if (persistenceManagerFactory == null) {
+        	persistenceManagerFactory = JDOHelper.getPersistenceManagerFactory("transactions-optional");
+        }			
     }
 
 	protected static void tearDown() throws Exception {
