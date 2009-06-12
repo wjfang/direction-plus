@@ -34,15 +34,10 @@ public class UpdateStat {
 	private int newNum;
 	
 	/**
-	 * The number of news that are known since the last update.
-	 */
-	private int lastingNum;
-	
-	/**
 	 * The number of news that are new since the last update, but whose coordinates 
 	 * are located in the previous updates. This indicates the effect of coordinate caching.
 	 */
-	private int comeBackNum;
+	private int coordinateHitNum;
 
 	public final Long getId() {
 		return id;
@@ -84,20 +79,12 @@ public class UpdateStat {
 		this.newNum = newNum;
 	}
 
-	public final int getLastingNum() {
-		return lastingNum;
+	public final int getCoordinateHitNum() {
+		return coordinateHitNum;
 	}
 
-	public final void setLastingNum(int lastingNum) {
-		this.lastingNum = lastingNum;
-	}
-
-	public final int getComeBackNum() {
-		return comeBackNum;
-	}
-
-	public final void setComeBackNum(int comeBackNum) {
-		this.comeBackNum = comeBackNum;
+	public final void setCoordinateHitNum(int coordinateHitNum) {
+		this.coordinateHitNum = coordinateHitNum;
 	}
 	
 }
