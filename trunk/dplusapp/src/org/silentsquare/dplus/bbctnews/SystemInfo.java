@@ -11,6 +11,8 @@ public class SystemInfo {
     private String id;
 	
 	private long startUpTime;
+	
+	private int updateNum;
 
 	public final String getId() {
 		return id;
@@ -26,6 +28,14 @@ public class SystemInfo {
 
 	public final void setStartUpTime(long startUpTime) {
 		this.startUpTime = startUpTime;
+	}
+
+	public final int getUpdateNum() {
+		return updateNum;
+	}
+
+	public final void setUpdateNum(int updateNum) {
+		this.updateNum = updateNum;
 	}
 
 }
