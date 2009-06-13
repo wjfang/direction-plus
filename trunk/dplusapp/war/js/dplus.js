@@ -15,8 +15,8 @@ var EXTRA_URBAN_AVERAGE = 39; // average speed in extra urban cycle
  */
 function Preference(config) {
 	this.data = {
-		owner:					"Piggy",
-		car_desc:				"2009 Volkswagen Polo Match 1.4 80hp",
+		owner:					"Who",
+		car_desc:				"what car",
 		urban_mpg:				new Number(34.0),
 		extra_urban_mpg: 		new Number(54.3),
 		combined_mpg: 			new Number(44.8),
