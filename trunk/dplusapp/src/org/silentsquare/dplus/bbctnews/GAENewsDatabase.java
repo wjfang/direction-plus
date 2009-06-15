@@ -166,6 +166,7 @@ public class GAENewsDatabase extends AbstractNewsDatabase {
 		try {
 			SystemInfo systemInfo = getSystemInfo(persistenceManager);
 			statusList.add(new StatusEntry("Startup Time", formatTime(systemInfo.getStartUpTime())));
+			statusList.add(new StatusEntry("Current Time", formatTime(System.currentTimeMillis())));
 			statusList.add(new StatusEntry("Completed Updates", systemInfo.getUpdateNum() + ""));
 			statusList.add(new StatusEntry("Average Update Time (sec)", 
 					systemInfo.getUpdateNum() == 0 ? "N/A" :
@@ -298,35 +299,50 @@ public class GAENewsDatabase extends AbstractNewsDatabase {
 			return;
 		
 		Long id = updateProcess.getNewsIdList().get(updateProcess.getNewsIndex());
-		News news = persistenceManager.getObjectById(News.class, id);
-		String location = news.getLocation();
-		
-		UpdateStat updateStat = persistenceManager.getObjectById(
-				UpdateStat.class, updateProcess.getUpdateStatId());
 		
 		/*
-		 * First check if there is an obsolete news with the same location;
-		 * if failed, use CoordinateFinder.
-		 */		
-		Coordinate co = findCachedCoordinate(persistenceManager, location);
-		if (co == null) {
-			co = coordinateFinder.search(location);
-		} else {
-			// Found a cached coordinate
-			updateStat.setCoordinateHitNum(updateStat.getCoordinateHitNum() + 1);
-			persistenceManager.makePersistent(updateStat);
+		 * Sometimes the IDed news may not be written to the data store due to exceptions happening
+		 * in the previous update operations, such as com.google.apphosting.api.DeadlineExceededException
+		 * or com.google.appengine.api.datastore.DatastoreTimeoutException, so getObjectById() may throw out
+		 * a JDOObjectNotFoundException that prevents the update process continuing.
+		 */
+		try {
+			News news = persistenceManager.getObjectById(News.class, id);
+			
+			String location = news.getLocation();
+			
+			UpdateStat updateStat = persistenceManager.getObjectById(
+					UpdateStat.class, updateProcess.getUpdateStatId());
+			
+			/*
+			 * First check if there is an obsolete news with the same location;
+			 * if failed, use CoordinateFinder.
+			 */		
+			Coordinate co = findCachedCoordinate(persistenceManager, location);
+			if (co == null) {
+				co = coordinateFinder.search(location);
+			} else {
+				// Found a cached coordinate
+				updateStat.setCoordinateHitNum(updateStat.getCoordinateHitNum() + 1);
+				persistenceManager.makePersistent(updateStat);
+			}
+			
+			if (co != null) {
+				news.setLatitude(co.getLatitude());
+				news.setLongitude(co.getLongitude());
+				persistenceManager.makePersistent(news);
+			} else {
+				// Can not find coordinate, no need to keep this news.
+				persistenceManager.deletePersistent(news);
+			}
+			
+		} catch (JDOObjectNotFoundException e) {
+			logger.severe(e.getLocalizedMessage());
+		} catch (Exception e) {
+			logger.severe(e.getLocalizedMessage());
+		} finally {
+			updateProcess.setNewsIndex(updateProcess.getNewsIndex() + 1);
 		}
-		
-		if (co != null) {
-			news.setLatitude(co.getLatitude());
-			news.setLongitude(co.getLongitude());
-			persistenceManager.makePersistent(news);
-		} else {
-			// Can not find coordinate, no need to keep this news.
-			persistenceManager.deletePersistent(news);
-		}
-		
-		updateProcess.setNewsIndex(updateProcess.getNewsIndex() + 1);
 	}
 
 	private Coordinate findCachedCoordinate(PersistenceManager persistenceManager, String location) {
