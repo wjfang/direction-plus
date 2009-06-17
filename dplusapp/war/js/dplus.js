@@ -214,6 +214,7 @@ Info.prototype.updateUI = function() {
  */
 function TravelNewsDatabase(map, config) {
 	this.endpoint = "./queryNewsDB";
+	this.endpoint2 = "./queryNewsDBByRoute";
 	this.map = map; // Google map
 	this.markerLists = [new Array(), new Array(), new Array(), new Array(), new Array(), new Array(), new Array()];
 	
@@ -350,6 +351,11 @@ TravelNewsDatabase.prototype.query = function(route) {
 	YAHOO.util.Connect.asyncRequest('POST', this.endpoint, this, request); 
 }
 
+TravelNewsDatabase.prototype.queryByRoute = function(route) {
+	var request = YAHOO.lang.JSON.stringify(route); 
+	YAHOO.util.Connect.asyncRequest('POST', this.endpoint2, this, request); 
+}
+
 /*
  * DPlus
  */
@@ -468,7 +474,8 @@ DPlus.prototype.analyseRoute = function() {
 	this.info.updateUI();
 	this.info.reset();
 	
-	this.travelNewsDatabase.query(route);
+//	this.travelNewsDatabase.query(route);
+	this.travelNewsDatabase.queryByRoute(route);
 }
 
 // Google Maps 

@@ -17,6 +17,18 @@
 		<servlet-name>NewsDatabaseQueryServlet</servlet-name>
 		<url-pattern>/queryNewsDB</url-pattern>
 	</servlet-mapping>
+	
+	<servlet>
+		<description></description>
+		<display-name>NewsDatabaseQueryByRouteServlet</display-name>
+		<servlet-name>NewsDatabaseQueryByRouteServlet</servlet-name>
+		<servlet-class>org.silentsquare.dplus.bbctnews.NewsDatabaseQueryByRouteServlet</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>NewsDatabaseQueryByRouteServlet</servlet-name>
+		<url-pattern>/queryNewsDBByRoute</url-pattern>
+	</servlet-mapping>
  	
 	<servlet>
 		<description></description>
