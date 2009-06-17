@@ -6,6 +6,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Logger;
 
+import org.silentsquare.dplus.bbctnews.Route.Step;
+
 public abstract class AbstractNewsDatabase implements NewsDatabase {
 	
 	private static final Logger logger = Logger.getLogger(AbstractNewsDatabase.class.getName()); 
@@ -85,6 +87,32 @@ public abstract class AbstractNewsDatabase implements NewsDatabase {
 				left = p[1];
 			if (p[1] > right)
 				right = p[1];
+		}
+		
+		return new Rectangle(bottom, top, left, right);
+	}
+	
+	protected List<News> lookUpInList(Route route, List<News> newslist) {		
+		// TODO
+		return null;
+	}
+	
+	protected Rectangle calculateRectangle(Route route) {
+		float bottom = 90;
+		float top = -90;
+		float left = 180;
+		float right = -180;
+		
+		for (Step step : route.getStepList()) {
+//			if (p[0] < bottom) 
+//				bottom = p[0];
+//			if (p[0] > top) 
+//				top = p[0];
+//			if (p[1] < left)
+//				left = p[1];
+//			if (p[1] > right)
+//				right = p[1];
+			// TODO
 		}
 		
 		return new Rectangle(bottom, top, left, right);
