@@ -207,7 +207,11 @@ public class GAENewsDatabase extends AbstractNewsDatabase {
 
 	@Override
 	public List<News> query(Route route) {
+		long begin = System.currentTimeMillis();
 		// TODO Auto-generated method stub
+		
+		logger.info("Query walltime: " + (System.currentTimeMillis() - begin) + " ms");	
+		
 		return null;
 	}
 	
