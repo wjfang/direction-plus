@@ -205,6 +205,12 @@ public class GAENewsDatabase extends AbstractNewsDatabase {
 		return lookUpInList(waypoints, nl);
 	}
 
+	@Override
+	public List<News> query(Route route) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
 	private List<News> findNewsByLatRange(float bottom, float top) {
 		List<News> nl = Collections.EMPTY_LIST;
 		PersistenceManager persistenceManager = persistenceManagerFactory.getPersistenceManager();
