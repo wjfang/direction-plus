@@ -5,11 +5,18 @@ import java.util.List;
 public interface NewsDatabase {
 	
 	/**
-	 * 
+	 * Find relevant travel news based on waypoints.
 	 * @param waypoints a list of points of latitude and longitude.
 	 * @return
 	 */
 	public List<News> query(List<float[]> waypoints);
+	
+	/**
+	 * Find relevant travel news based on GRoute.
+	 * @param route GRoute
+	 * @return
+	 */
+	public List<News> query(Route route);
 	
 	/**
 	 * Update news database.
