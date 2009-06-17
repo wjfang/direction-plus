@@ -208,11 +208,12 @@ public class GAENewsDatabase extends AbstractNewsDatabase {
 	@Override
 	public List<News> query(Route route) {
 		long begin = System.currentTimeMillis();
-		// TODO Auto-generated method stub
 		
-		logger.info("Query walltime: " + (System.currentTimeMillis() - begin) + " ms");	
+		Rectangle rec = calculateRectangle(route);
+		List<News> nl = findNewsByLatRange(rec.bottom, rec.top);
 		
-		return null;
+		logger.info("Query walltime: " + (System.currentTimeMillis() - begin) + " ms");			
+		return lookUpInList(route, nl);
 	}
 	
 	private List<News> findNewsByLatRange(float bottom, float top) {
