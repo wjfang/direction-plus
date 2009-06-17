@@ -35,5 +35,12 @@ public class RouteTestCase {
 		if (step.isLongEnough())
 			System.out.println(step.guessRoad());
 	}
+	
+	@Test
+	public void testMatchRoad() {
+		String title = "[Severe] M1(A) Bedfordshire, both ways at A421, Milton Keynes South, Bedfordshire [M1J.13]";
+		System.out.println(title.matches(".*\\bM1.A\\b.*"));	
+		System.out.println("A74(M)".replace('(', '.'));
+	}
 
 }
