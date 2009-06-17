@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Logger;
 
+import org.silentsquare.dplus.bbctnews.Route.LatLng;
 import org.silentsquare.dplus.bbctnews.Route.Step;
 
 public abstract class AbstractNewsDatabase implements NewsDatabase {
@@ -92,32 +93,74 @@ public abstract class AbstractNewsDatabase implements NewsDatabase {
 		return new Rectangle(bottom, top, left, right);
 	}
 	
-	protected List<News> lookUpInList(Route route, List<News> newslist) {		
-		// TODO
-		return null;
+	protected List<News> lookUpInList(Route route, List<News> newslist) {	
+		List<News> cadidates = lookUpInList(calculateRectangle(route), newslist);
+		
+		/*
+		 * Must be sorted before passed to loolUpInList().
+		 */
+		Collections.sort(cadidates, latitudeComparator);
+		
+		List<News> results = new ArrayList<News>();
+		List<Step> steplist = route.getStepList();
+		for (int i = 0; i < steplist.size(); i++) {
+			Step step = steplist.get(i);
+			float[] start = new float[]{step.getStart().getLatitude(), step.getStart().getLongitude()};
+			float[] end;
+			if (i < steplist.size() - 1) {
+				Step step2 = steplist.get(i + 1);
+				end = new float[]{step2.getStart().getLatitude(), step2.getStart().getLongitude()};
+			} else {
+				end = new float[]{route.getEnd().getLatitude(), route.getEnd().getLongitude()};
+			}
+			List<News> nl = lookUpInList(start, end, cadidates);
+			if (step.isLongEnough() && !"".equals(step.guessRoad())) {
+				List<News> nl2 = new ArrayList<News>();
+				String road = step.guessRoad();
+				road = road.replace('(', '.');
+				int j = road.indexOf(')');
+				if (j != -1)
+					road = road.substring(0, j);
+				String pattern = ".*\\b" + road + "\\b.*";
+				for (News news : nl) {
+					if (news.getTitle().matches(pattern)) {
+						nl2.add(news);
+						logger.info(news.getTitle() + " matches " + step.guessRoad());
+					}
+				}
+				nl = nl2;
+			}
+			results.addAll(nl);
+		}
+		
+		return results;
 	}
 	
 	protected Rectangle calculateRectangle(Route route) {
-		float bottom = 90;
-		float top = -90;
-		float left = 180;
-		float right = -180;
+		Rectangle rec = new Rectangle(90, -90, 180, -180);
 		
 		for (Step step : route.getStepList()) {
-//			if (p[0] < bottom) 
-//				bottom = p[0];
-//			if (p[0] > top) 
-//				top = p[0];
-//			if (p[1] < left)
-//				left = p[1];
-//			if (p[1] > right)
-//				right = p[1];
-			// TODO
+			LatLng ll = step.getStart();
+			calculateRectangle(rec, ll);
 		}
 		
-		return new Rectangle(bottom, top, left, right);
+		LatLng ll = route.getEnd();
+		calculateRectangle(rec, ll);
+		
+		return rec;
 	}
 	
+	private void calculateRectangle(Rectangle rec, LatLng ll) {
+		if (ll.getLatitude() < rec.bottom) 
+			rec.bottom = ll.getLatitude();
+		if (ll.getLatitude() > rec.top) 
+			rec.top = ll.getLatitude();
+		if (ll.getLongitude() < rec.left)
+			rec.left = ll.getLongitude();
+		if (ll.getLongitude() > rec.right)
+			rec.right = ll.getLongitude();		
+	}
+
 	/**
 	 * 
 	 * @param startpoint

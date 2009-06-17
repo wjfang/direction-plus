@@ -51,9 +51,9 @@ public class Route {
 			s.setDescriptionHtml(step.getString("descriptionHtml"));
 			JSONArray co = step.getJSONObject("Point").getJSONArray("coordinates");
 			s.setStart(new LatLng(co.getDouble(1), co.getDouble(0)));
-			if (s.isLongEnough()) {
-				logger.info(s.guessRoad());
-			}
+//			if (s.isLongEnough()) {
+//				logger.info(s.guessRoad());
+//			}
 			r.getStepList().add(s);
 			logger.fine(s.toString());
 		}
