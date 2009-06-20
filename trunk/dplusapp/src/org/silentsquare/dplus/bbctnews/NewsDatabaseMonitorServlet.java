@@ -10,21 +10,16 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.silentsquare.dplus.Configuration;
 import org.silentsquare.dplus.bbctnews.NewsDatabase.StatusEntry;
 import org.silentsquare.dplus.bbctnews.NewsDatabase.StatusPart;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * Servlet implementation class NewsDataBaseQueryServlet
  */
-public class NewsDatabaseMonitorServlet extends HttpServlet {
+public class NewsDatabaseMonitorServlet extends AbstractNewsDatabaseServlet {
 	private static final long serialVersionUID = 1L;
 	
 	private static final Logger logger = Logger.getLogger(NewsDatabaseMonitorServlet.class.getName());
-	
-	private NewsDatabase newsDatabase;
 	
 	/**
      * @see HttpServlet#HttpServlet()
@@ -34,13 +29,6 @@ public class NewsDatabaseMonitorServlet extends HttpServlet {
     }
 
     @Override
-    public void init() throws ServletException {
-    	WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(this.getServletContext());
-    	Configuration cfg = (Configuration) ctx.getBean("configuration");
-    	newsDatabase = cfg.getNewsDatabase();
-    }
-    
-	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		List<StatusPart> status = newsDatabase.monitor();
 		
