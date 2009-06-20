@@ -1,0 +1,13 @@
+<datastore-indexes autoGenerate="true">
+    <datastore-index kind="News" ancestor="false">
+        <property name="obsolete" direction="asc"/>
+        <property name="url" direction="asc"/>
+        <property name="location" direction="asc"/>
+        <property name="degree" direction="desc"/>
+    </datastore-index>
+
+    <datastore-index kind="News" ancestor="false">
+        <property name="obsolete" direction="asc"/>
+        <property name="latitude" direction="asc"/>
+    </datastore-index>
+</datastore-indexes>
