@@ -90,6 +90,57 @@ public class GAENewsDatabase extends AbstractNewsDatabase {
 	}
 	
 	@Override
+	public void clean() {
+		long begin = System.currentTimeMillis();
+		cleanObsoleteNews();
+		cleanOldUpdateStat();
+		logger.info("Clean walltime: " + (System.currentTimeMillis() - begin) + " ms");
+	}
+	
+	private void cleanOldUpdateStat() {
+		// One week ago
+		long d = System.currentTimeMillis() - 1000 * 3600 * 24 * 7;
+		
+		PersistenceManager persistenceManager = persistenceManagerFactory.getPersistenceManager();
+		try {
+			Query query = persistenceManager.newQuery(UpdateStat.class);
+			query.setFilter("startTime < " + d);
+		    query.setOrdering("startTime asc");
+		    query.setRange(0, 50);
+		    List<UpdateStat> list = null;
+		    try {
+		    	list  = (List<UpdateStat>) query.execute();
+		    } finally {
+		        query.closeAll();
+		    }
+		    persistenceManager.deletePersistentAll(list);
+		    logger.info("Deleted " + list.size() + " update stats one week old.");
+		} finally {
+			persistenceManager.close();
+		}		
+	}
+
+	private void cleanObsoleteNews() {
+		PersistenceManager persistenceManager = persistenceManagerFactory.getPersistenceManager();
+		try {
+			Query query = persistenceManager.newQuery(News.class);
+			query.setFilter("obsolete == true");
+			query.setRange(0, 50);
+
+			List<News> nl = null;
+			try {
+				 nl = (List<News>) query.execute();
+			} finally {
+				query.closeAll();
+			}
+			persistenceManager.deletePersistentAll(nl);
+			logger.info("Deleted " + nl.size() + " obsolete news items.");
+		} finally {
+			persistenceManager.close();
+		}
+	}
+
+	@Override
 	public List<StatusPart> monitor() {
 		long begin = System.currentTimeMillis();
 		List<StatusPart> status = new ArrayList<StatusPart>();

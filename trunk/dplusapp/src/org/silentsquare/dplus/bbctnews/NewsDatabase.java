@@ -48,4 +48,9 @@ public interface NewsDatabase {
 			this.value = v;
 		}
 	}
+
+	/**
+	 * Clean up obsolete news items.
+	 */
+	public void clean();
 }
