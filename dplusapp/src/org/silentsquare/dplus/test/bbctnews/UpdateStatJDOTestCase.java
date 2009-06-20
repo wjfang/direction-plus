@@ -2,6 +2,7 @@ package org.silentsquare.dplus.test.bbctnews;
 
 import static org.junit.Assert.*;
 
+import java.util.Calendar;
 import java.util.List;
 
 import javax.jdo.PersistenceManager;
@@ -67,9 +68,29 @@ public class UpdateStatJDOTestCase extends GAETestCase {
 		    }
 		} finally {
 			persistenceManager.close();
-		}
+		}		
+	}
+	
+	@Test
+	public void testClean() throws Exception {
+		long d = System.currentTimeMillis() - 1000 * 3600 * 24 * 7;
 		
-		
+		persistenceManager = persistenceManagerFactory.getPersistenceManager();
+		try {
+			Query query = persistenceManager.newQuery(UpdateStat.class);
+			query.setFilter("startTime < " + d);
+		    query.setOrdering("startTime asc");
+		    query.setRange(0, 50);
+		    List<UpdateStat> list = null;
+		    try {
+		    	list  = (List<UpdateStat>) query.execute();
+		    } finally {
+		        query.closeAll();
+		    }
+		    persistenceManager.deletePersistentAll(list);
+		} finally {
+			persistenceManager.close();
+		}		
 	}
 
 }

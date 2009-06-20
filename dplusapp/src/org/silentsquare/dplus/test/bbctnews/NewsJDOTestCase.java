@@ -146,4 +146,23 @@ public class NewsJDOTestCase extends GAETestCase {
 		nl.get(0).setDegree(0);
 	}
 
+	@Test
+	public void testClean() throws Exception {
+		persistenceManager = persistenceManagerFactory.getPersistenceManager();
+		try {
+			Query query = persistenceManager.newQuery(News.class);
+			query.setFilter("obsolete == true");
+			query.setRange(0, 100);
+
+			List<News> nl = null;
+			try {
+				 nl = (List<News>) query.execute();
+			} finally {
+				query.closeAll();
+			}
+			persistenceManager.deletePersistentAll(nl);
+		} finally {
+			persistenceManager.close();
+		}
+	}
 }
