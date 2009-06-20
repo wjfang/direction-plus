@@ -53,7 +53,19 @@
 		<servlet-name>NewsDatabaseMonitorServlet</servlet-name>
 		<url-pattern>/monitorNewsDB</url-pattern>
 	</servlet-mapping>
-
+	
+	<servlet>
+		<description></description>
+		<display-name>NewsDatabaseCleanServlet</display-name>
+		<servlet-name>NewsDatabaseCleanServlet</servlet-name>
+		<servlet-class>org.silentsquare.dplus.bbctnews.NewsDatabaseCleanServlet</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>NewsDatabaseCleanServlet</servlet-name>
+		<url-pattern>/cleanNewsDB</url-pattern>
+	</servlet-mapping>
+	
 	<welcome-file-list>
 		<welcome-file>index.html</welcome-file>
 	</welcome-file-list>

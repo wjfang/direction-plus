@@ -2,7 +2,13 @@
 <cronentries>
   <cron>
     <url>/updateNewsDB?key=hellopiggy</url>
-    <description>Update travel news database</description>
+    <description>Incrementally update travel news database</description>
     <schedule>every 1 minutes</schedule>
+  </cron>
+
+  <cron>
+    <url>/cleanNewsDB</url>
+    <description>Clean up news database</description>
+    <schedule>every 1 hours</schedule>
   </cron>
 </cronentries>
