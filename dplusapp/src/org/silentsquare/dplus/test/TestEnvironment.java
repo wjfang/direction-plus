@@ -2,58 +2,41 @@ package org.silentsquare.dplus.test;
 
 import com.google.apphosting.api.ApiProxy;
 
-public class TestEnvironment implements ApiProxy.Environment  {
+import java.util.HashMap;
+import java.util.Map;
 
-	@Override
-	public String getAppId() {
-		return "Unit Tests";
-	}
+class TestEnvironment implements ApiProxy.Environment {
+  public String getAppId() {
+    return "test";
+  }
 
-	@Override
-	public String getAuthDomain() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+  public String getVersionId() {
+    return "1.0";
+  }
 
-	@Override
-	public String getDefaultNamespace() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+  public String getEmail() {
+    throw new UnsupportedOperationException();
+  }
 
-	@Override
-	public String getEmail() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+  public boolean isLoggedIn() {
+    throw new UnsupportedOperationException();
+  }
 
-	@Override
-	public String getRequestNamespace() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+  public boolean isAdmin() {
+    throw new UnsupportedOperationException();
+  }
 
-	@Override
-	public String getVersionId() {
-		return "1.0";
-	}
+  public String getAuthDomain() {
+    throw new UnsupportedOperationException();
+  }
 
-	@Override
-	public boolean isAdmin() {
-		// TODO Auto-generated method stub
-		return false;
-	}
+  public String getRequestNamespace() {
+    return "";
+  }
 
-	@Override
-	public boolean isLoggedIn() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void setDefaultNamespace(String arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
+  public Map<String, Object> getAttributes() {
+    Map<String, Object> map = new HashMap<String, Object>();
+    map.put("com.google.appengine.server_url_key", "http://localhost:8080");
+    return map;
+  }
 }
