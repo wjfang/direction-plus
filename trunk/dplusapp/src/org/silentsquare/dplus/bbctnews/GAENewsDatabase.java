@@ -278,13 +278,14 @@ public class GAENewsDatabase extends AbstractNewsDatabase {
 
 			try {
 				 nl = (List<News>) query.execute(bottom, top);
+				 logger.info("Found " + nl.size() + " news relevant to the input waypoints.");
 			} finally {
 				query.closeAll();
 			}
 		} finally {
 			persistenceManager.close();
 		}
-		logger.info("Found " + nl.size() + " news relevant to the input waypoints.");
+		
 		return nl;
 	}
 
