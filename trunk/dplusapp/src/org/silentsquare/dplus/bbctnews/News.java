@@ -35,10 +35,11 @@ public class News implements Serializable {
 	
 	/*
 	 * title, description and link directly come from the feed.
+	 * String must be less than 500 characters. Otherwise have to use Text.
 	 */
 	private String title;
 	private String description;
-	private String link;
+	private String link;	
 	
 	/*
 	 * True if this news is obsolete. 
@@ -76,7 +77,7 @@ public class News implements Serializable {
 	public News(String url, String title, String description, String link) {
 		this.url = url;
 		this.title = title;
-		this.description = description;
+		this.description = description.length() >= 450 ? description.substring(0, 450) : description;
 		this.link = link;
 		this.createTime = System.currentTimeMillis();
 		this.updateTime = this.createTime;
